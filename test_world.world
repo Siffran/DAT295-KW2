@@ -1,0 +1,39 @@
+<?xml version="1.0" ?>
+<sdf version="1.7">
+  <world name="default">
+
+    <!-- A global light source -->
+    <include>
+      <uri>model://sun</uri>
+    </include>
+
+    <!-- A ground plane -->
+    <include>
+      <uri>model://ground_plane</uri>
+    </include>
+    <!-- Asphalt -->
+      <include>
+        <uri>model://asphalt_plane_1000x1000</uri>
+    </include>
+
+    <!-- automatic population of objects -->
+    <population name="lamp_post_population">
+      <model name="lamp_post">
+        <include>
+          <static>true</static>
+          <uri>model://lamp_post</uri>
+          <pose>0 0 0 0 0 1.57</pose>
+        </include>
+      </model>
+      <pose>-5 300 0 0 0 0</pose>
+      <box>
+        <size>2 600 0.01</size>
+      </box>
+      <model_count>10</model_count>
+      <distribution>
+        <type>linear-y</type>
+      </distribution>
+    </population>
+
+  </world>
+</sdf>
