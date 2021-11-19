@@ -1,5 +1,10 @@
 # How to start Gazebo Ros Example
 
+## Helpful Links
+- https://wiki.ros.org/urdf/Tutorials
+- http://gazebosim.org/tutorials?tut=ros_control&cat=connect_ros
+- https://www.youtube.com/watch?v=mtSpqObg9X4
+
 ## Copy folders in your catkin_ws/src/
 
 ## Dependencies
