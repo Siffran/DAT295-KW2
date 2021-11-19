@@ -1,6 +1,6 @@
 # How to start Gazebo Ros Example
 
-##Copy folders in your catkin_ws/src/
+## Copy folders in your catkin_ws/src/
 
 ## Dependencies
 Make sure that you have installed all dependencies.
