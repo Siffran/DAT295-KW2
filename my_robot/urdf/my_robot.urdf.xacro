@@ -1,0 +1,72 @@
+<?xml version="1.0"?>
+<robot xmlns:xacro="http://www.ros.org/wiki/xacro" name="my_robot">
+
+  <xacro:property name="length" value="2" />
+  <xacro:property name="width" value="1" />
+  <xacro:property name="height" value="0.5" />
+
+  <material name="blue">
+  <color rgba="1 0 0.8 1"/>
+  </material>
+
+  <xacro:macro name="default_inertial" params="mass">
+    <inertial>
+      <origin rpy="0.0 0 0" xyz="0 0 0"/>
+      <mass value="${mass}" />
+      <inertia ixx="1.0" ixy="0.0" ixz="0.0" iyy="1.0" iyz="0.0" izz="1.0" />
+    </inertial>
+  </xacro:macro>
+
+  <link name="world"/>
+
+  <link name="my_robot_link">
+    <visual>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+      <geometry>
+        <box size="${length} ${width} ${height}"/>
+      </geometry>
+      <material name="blue"/>
+    </visual>
+    <collision>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+      <geometry>
+        <box size="${length} ${width} ${height}"/>
+      </geometry>
+    </collision>
+    <xacro:default_inertial mass="10"/>
+  </link>
+
+  <gazebo reference="my_robot_link">
+    <mu1>10.0</mu1>
+    <mu2>10.0</mu2>
+    <material> Gazebo/Red</material>
+  </gazebo>
+
+  <joint name="my_robot_x" type="prismatic">
+    <origin rpy="0 0 0" xyz="0 0 0"/>
+    <parent link="world"/>
+    <child link="my_robot_link"/>
+    <axis xyz="1 0 0"/>
+    <limit effort="10000" lower="-5.0" upper="5.0" velocity="1"/>
+  </joint>
+
+  <transmission name="tran1">
+    <type>transmission_interface/SimpleTransmission</type>
+    <joint name="my_robot_x">
+      <hardwareInterface>EffortJointInterface</hardwareInterface>
+    </joint>
+    <actuator name="motor1">
+      <hardwareInterface>EffortJointInterface</hardwareInterface>
+      <mechanicalReduction>1</mechanicalReduction>
+    </actuator>
+  </transmission>
+
+
+  <!-- Gazebo plugin for ROS Control -->
+  <gazebo>
+    <plugin name="gazebo_ros_control" filename="libgazebo_ros_control.so">
+      <robotNamespace>/my_robot</robotNamespace>
+    </plugin>
+  </gazebo>
+
+</robot>
