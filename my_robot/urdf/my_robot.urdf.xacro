@@ -4,7 +4,13 @@
   <xacro:property name="length" value="2" />
   <xacro:property name="width" value="1" />
   <xacro:property name="height" value="0.5" />
-
+  <xacro:property name="imu_link" value="0.1" /> <!-- Size of imu -->
+  <xacro:property name="hokuyo_link" value="0.1" /> <!-- Size of hokuyo -->
+  <xacro:property name="camera_link" value="0.1" /> <!-- Size of camera -->
+  
+<!-- Import all Gazebo-customization elements, including Gazebo colors -->
+  <xacro:include filename="$(find my_robot)/urdf/my_robot.gazebo" />
+  
   <material name="blue">
   <color rgba="1 0 0.8 1"/>
   </material>
@@ -63,10 +69,112 @@
 
 
   <!-- Gazebo plugin for ROS Control -->
-  <gazebo>
+    <gazebo>
     <plugin name="gazebo_ros_control" filename="libgazebo_ros_control.so">
       <robotNamespace>/my_robot</robotNamespace>
     </plugin>
   </gazebo>
+  
+   <!-- Gazebo plugin for imu -->
+  <joint name="imu_joint" type="fixed">
+    <axis xyz="0 0 0" />
+    <origin xyz="${length/2+imu_link/2} 0 0" rpy="0 0 0"/>
+    <parent link="my_robot_link"/>
+    <child link="imu_link"/>
+  </joint>
 
+    <link name="imu_link">
+    <collision>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <geometry>
+	<box size="${imu_link} ${imu_link} ${imu_link}"/>
+      </geometry>
+    </collision>
+
+    <visual>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <geometry>
+        <box size="${imu_link} ${imu_link} ${imu_link}"/>
+      </geometry>
+    </visual>
+
+    <inertial>
+      <mass value="1e-5" />
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <inertia ixx="1e-6" ixy="0" ixz="0" iyy="1e-6" iyz="0" izz="1e-6" />
+    </inertial>
+  </link>
+  
+  <!-- Gazebo plugin for laser scan sensor -->
+  <joint name="hokuyo_joint" type="fixed">
+    <axis xyz="0 0 0" />
+    <origin xyz="0 ${-width/2-hokuyo_link/2} 0" rpy="0 0 0"/>
+    <parent link="my_robot_link"/>
+    <child link="hokuyo_link"/>
+  </joint>
+
+  <link name="hokuyo_link">
+    <collision>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <geometry>
+	<box size="0.1 0.1 0.1"/>
+      </geometry>
+    </collision>
+
+    <visual>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <geometry>
+        <box size="${hokuyo_link} ${hokuyo_link} ${hokuyo_link}"/>
+      </geometry>
+    </visual>
+
+    <inertial>
+      <mass value="1e-5" />
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <inertia ixx="1e-6" ixy="0" ixz="0" iyy="1e-6" iyz="0" izz="1e-6" />
+    </inertial>
+  </link>
+  
+  <!-- Camera -->
+  <joint name="camera_joint" type="fixed">
+    <axis xyz="0 0 0" />
+    <origin xyz="0 0 ${height/2+camera_link/2} " rpy="0 0 0"/>
+    <parent link="my_robot_link"/>
+    <child link="camera_link"/>
+  </joint>
+
+  <link name="camera_link">
+    <collision>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <geometry>
+	<box size="${camera_link} ${camera_link} ${camera_link}"/>
+      </geometry>
+    </collision>
+
+    <visual>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <geometry>
+	<box size="${camera_link} ${camera_link} ${camera_link}"/>
+      </geometry>
+    </visual>
+
+    <inertial>
+      <mass value="1e-5" />
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <inertia ixx="1e-6" ixy="0" ixz="0" iyy="1e-6" iyz="0" izz="1e-6" />
+    </inertial>
+  </link>
+  
+    <!-- generate an optical frame http://www.ros.org/reps/rep-0103.html#suffix-frames
+      so that ros and opencv can operate on the camera frame correctly -->
+  <joint name="camera_optical_joint" type="fixed">
+    <!-- these values have to be these values otherwise the gazebo camera image
+        won't be aligned properly with the frame it is supposedly originating from -->
+    <origin xyz="0 0 0" rpy="${-pi/2} 0 ${-pi/2}"/>
+    <parent link="camera_link"/>
+    <child link="camera_link_optical"/>
+  </joint>
+
+  <link name="camera_link_optical">
+  </link>
 </robot>
