@@ -14,6 +14,13 @@ Make sure that you have installed all dependencies.
 Make sure that everything is compiled by catkin_make.
 
 ## Startup
+### Using start.sh:
+
+chmod +x start.sh
+./start.sh
+
+OR Manually:
+
 ### roscore
 - source your ROS
 - start roscore
