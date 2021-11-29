@@ -12,7 +12,7 @@
       <uri>model://ground_plane</uri>
     </include>
     <!-- Asphalt -->
-      <include>
+    <include>
         <uri>model://asphalt_plane_1000x1000</uri>
     </include>
 
