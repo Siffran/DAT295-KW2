@@ -5,10 +5,13 @@
 - http://gazebosim.org/tutorials?tut=ros_control&cat=connect_ros
 - https://www.youtube.com/watch?v=mtSpqObg9X4
 
-## Copy folders in your catkin_ws/src/
+## Copy folders to your catkin_ws/src/
+## Copy models to your gazebo root
+cd to my_robot/worlds
+cp models  ~/.gazebo/models -r
 
 ## Dependencies
-Make sure that you have installed all dependencies.
+Make sure that you have installed all dependencies. *(you might be missing gazebo_ros_control)*
 
 ## Compiled
 Make sure that everything is compiled by catkin_make.
@@ -17,7 +20,6 @@ Make sure that everything is compiled by catkin_make.
 ### * Using start.sh:
 
 chmod +x start.sh 
-
 ./start.sh
 
 ### * Manually
