@@ -4,8 +4,8 @@
   <rosparam file="$(find my_robot_control)/config/my_robot_control.yaml" command="load"/>
 
   <!-- load the controllers -->
-  <node name="controller_spawner_x" pkg="controller_manager" type="spawner" respawn="false"
-    output="screen" ns="/my_robot" args="my_robot_x_position_controller joint_state_controller"/>
+  <!--<node name="controller_spawner_x" pkg="controller_manager" type="spawner" respawn="false"
+    output="screen" ns="/my_robot" args="my_robot_x_position_controller joint_state_controller"/>-->
   <node name="controller_spawner_y" pkg="controller_manager" type="spawner" respawn="false"
     output="screen" ns="/my_robot" args="my_robot_y_position_controller joint_state_controller"/>
   <!--<node name="controller_spawner_entity" pkg="controller_manager" type="spawner" respawn="false"

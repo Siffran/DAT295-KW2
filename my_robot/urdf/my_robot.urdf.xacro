@@ -9,12 +9,12 @@
     <inertial>
       <origin rpy="0.0 0 0" xyz="0 0 0"/>
       <mass value="${mass}" />
-      <inertia ixx="0.4" ixy="0.0" ixz="0.0" iyy="0.4" iyz="0.0" izz="0.2" />
+      <inertia ixx="0.0" ixy="0.0" ixz="0.0" iyy="0.0" iyz="0.0" izz="0.0" />
     </inertial>
   </xacro:macro>
 
   <link name="world"/>
-
+<!--
   <link name="my_robot_xpart">
     <visual>
       <origin rpy="0 0 0" xyz="0 0 ${height/2}"/>
@@ -56,6 +56,7 @@
       <mechanicalReduction>1</mechanicalReduction>
     </actuator>
   </transmission>
+-->
 
   <link name="my_robot_ypart">
     <visual>
@@ -70,7 +71,7 @@
         <box size="${length} ${width} ${height/2}"/>
       </geometry>
     </collision>
-    <xacro:default_inertial mass="10"/>
+    <xacro:default_inertial mass="0.1"/>
   </link>
 
   <gazebo reference="my_robot_ypart">
@@ -81,7 +82,7 @@
 
   <joint name="my_robot_y" type="prismatic">
     <origin rpy="0 0 0" xyz="0 0 0"/>
-    <parent link="my_robot_xpart"/>
+    <parent link="world"/>
     <child link="my_robot_ypart"/>
     <axis xyz="0 1 0"/>
     <dynamics damping="0" friction="0"/>

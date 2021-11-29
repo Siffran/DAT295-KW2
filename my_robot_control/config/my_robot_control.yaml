@@ -5,10 +5,10 @@ my_robot:
     publish_rate: 50
 
   # Position Controllers ---------------------------------------
-  my_robot_x_position_controller:
-    type: effort_controllers/JointPositionController
-    joint: my_robot_x
-    pid: {p: 100.0, i: 0.01, d: 10.0}
+  #my_robot_x_position_controller:
+  #  type: effort_controllers/JointPositionController
+  #  joint: my_robot_x
+  #  pid: {p: 100.0, i: 0.01, d: 10.0}
 
   my_robot_y_position_controller:
     type: effort_controllers/JointPositionController
