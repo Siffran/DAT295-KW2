@@ -4,6 +4,8 @@
   <xacro:property name="length" value="1" />
   <xacro:property name="width" value="1" />
   <xacro:property name="height" value="0.5" />
+  <xacro:property name="length_wheel" value="0.2" />
+  <xacro:property name="radius_wheel" value="0.2" />
 
   <xacro:macro name="default_inertial" params="mass">
     <inertial>
@@ -58,8 +60,8 @@
   </transmission>
 -->
 
-  <link name="my_robot_ypart">
-    <visual>
+  <link name="base_link">
+    <visual> 
       <origin rpy="0 0 0" xyz="0 0 0"/>
       <geometry>
         <box size="${length} ${width} ${height/2}"/>
@@ -74,24 +76,118 @@
     <xacro:default_inertial mass="0.1"/>
   </link>
 
-  <gazebo reference="my_robot_ypart">
-    <mu1>10.0</mu1>
-    <mu2>10.0</mu2>
-    <material> Gazebo/Blue</material>
-  </gazebo>
+  <link name="wheel_1">
+    <visual>
+            <geometry>
+                <cylinder length="${length_wheel}" radius="${radius_wheel}"/>
+            </geometry>
+        <origin rpy="0 0 0" xyz="0 0 0"/>
+        <material name="black">
+            <color rgba="0 0 0 1"/>
+        </material>
+    </visual>
+    <collision>
+        <geometry>
+                <cylinder length="${length_wheel}" radius="${radius_wheel}"/>
+        </geometry>
+    </collision>
+    <xacro:default_inertial mass="0.1"/>
+</link>
 
-  <joint name="my_robot_y" type="prismatic">
+<link name="wheel_2">
+  <visual>
+          <geometry>
+              <cylinder length="${length_wheel}" radius="${radius_wheel}"/>
+          </geometry>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+      <material name="black">
+          <color rgba="0 0 0 1"/>
+      </material>
+  </visual>
+  <collision>
+      <geometry>
+              <cylinder length="${length_wheel}" radius="${radius_wheel}"/>
+      </geometry>
+  </collision>
+  <xacro:default_inertial mass="0.1"/>
+</link>
+
+<link name="wheel_3">
+  <visual>
+          <geometry>
+              <cylinder length="${length_wheel}" radius="${radius_wheel}"/>
+          </geometry>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+      <material name="black">
+          <color rgba="0 0 0 1"/>
+      </material>
+  </visual>
+  <collision>
+      <geometry>
+              <cylinder length="${length_wheel}" radius="${radius_wheel}"/>
+      </geometry>
+  </collision>
+  <xacro:default_inertial mass="0.1"/>
+</link>
+
+<link name="wheel_4">
+  <visual>
+          <geometry>
+              <cylinder length="${length_wheel}" radius="${radius_wheel}"/>
+          </geometry>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+      <material name="black">
+          <color rgba="0 0 0 1"/>
+      </material>
+  </visual>
+  <collision>
+      <geometry>
+              <cylinder length="${length_wheel}" radius="${radius_wheel}"/>
+      </geometry>
+  </collision>
+  <xacro:default_inertial mass="0.1"/>
+</link>
+
+  <joint name="my_robot_base" type="prismatic">
     <origin rpy="0 0 0" xyz="0 0 0"/>
     <parent link="world"/>
-    <child link="my_robot_ypart"/>
+    <child link="base_link"/>
     <axis xyz="0 1 0"/>
     <dynamics damping="0" friction="0"/>
-    <limit effort="10000" lower="-50.0" upper="600.0" velocity="1"/>
+    <limit effort="10000" lower="-50.0" upper="600.0" velocity="0.1"/>
+  </joint>
+
+  <joint name="base_to_wheel1" type="continuous">
+    <parent link="base_link"/>
+    <child link="wheel_1"/>
+    <origin rpy="0 1.5707 0" xyz="0.6 0.4 0"/>
+    <axis xyz="0 0 1" />
+  </joint>
+
+  <joint name="base_to_wheel2" type="continuous">
+    <parent link="base_link"/>
+    <child link="wheel_2"/>
+    <origin rpy="0 1.5707 0" xyz="-0.6 0.4 0"/>
+    <axis xyz="0 0 1" />
+  </joint>
+
+  <joint name="base_to_wheel3" type="continuous">
+    <parent link="base_link"/>
+    <child link="wheel_3"/>
+    <origin rpy="0 1.5707 0" xyz="0.6 -0.4 0"/>
+    <axis xyz="0 0 1" />
+  </joint>
+
+  <joint name="base_to_wheel4" type="continuous">
+    <parent link="base_link"/>
+    <child link="wheel_4"/>
+    <origin rpy="0 1.5707 0" xyz="-0.6 -0.4 0"/>
+    <axis xyz="0 0 1" />
   </joint>
 
   <transmission name="tran2">
     <type>transmission_interface/SimpleTransmission</type>
-    <joint name="my_robot_y">
+    <joint name="my_robot_base">
       <hardwareInterface>EffortJointInterface</hardwareInterface>
     </joint>
     <actuator name="motor2">
@@ -105,8 +201,25 @@
     <parent link="my_robot_xpart"/>
     <child link="my_robot_ypart"/>
   </joint>-->
+<gazebo reference="base_link">
+    <material>Gazebo/Blue</material>
+</gazebo>
 
+<gazebo reference="wheel_1">
+    <material>Gazebo/Black</material>
+</gazebo>
 
+<gazebo reference="wheel_2">
+    <material>Gazebo/Black</material>
+</gazebo>
+
+<gazebo reference="wheel_3">
+    <material>Gazebo/Black</material>
+</gazebo>
+
+<gazebo reference="wheel_4">
+    <material>Gazebo/Black</material>
+</gazebo>
   <!-- Gazebo plugin for ROS Control -->
   <gazebo>
     <plugin name="gazebo_ros_control" filename="libgazebo_ros_control.so">
