@@ -33,7 +33,7 @@ chmod +x start.sh
 - roslaunch my_robot joints.launch
 ### start Controller
 - roslaunch my_robot_control my_robot_control.launch
-- rosrun rqt-gui rqt-gui
+- rosrun rqt_gui rqt_gui
   - select topic: /my_robot/my_robot_x_postition_controller/command
 
 ## Move
