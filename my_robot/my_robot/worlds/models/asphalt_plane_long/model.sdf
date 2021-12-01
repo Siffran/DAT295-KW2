@@ -1,47 +1,47 @@
 <?xml version='1.0'?>
 <sdf version='1.7'>
-  <model name='road2'>
-    <link name='link_1'>
+  <model name='asphalt_plane_long'>
+    <link name='link'>
+      <self_collide>0</self_collide>
+      <enable_wind>0</enable_wind>
+      <kinematic>0</kinematic>
+      <pose>0 0 0 0 -0 0</pose>
+      <gravity>1</gravity>
       <inertial>
         <mass>1</mass>
+        <pose>0 0 0 0 -0 0</pose>
         <inertia>
-          <ixx>0.166667</ixx>
+          <ixx>1</ixx>
           <ixy>0</ixy>
           <ixz>0</ixz>
-          <iyy>0.166667</iyy>
+          <iyy>1</iyy>
           <iyz>0</iyz>
-          <izz>0.166667</izz>
+          <izz>1</izz>
         </inertia>
-        <pose>0 0 0 0 -0 0</pose>
       </inertial>
-      <pose>-0 2e-06 0 0 -0 0</pose>
-      <gravity>0</gravity>
-      <self_collide>0</self_collide>
-      <kinematic>0</kinematic>
-      <enable_wind>0</enable_wind>
       <visual name='visual'>
-        <pose>0 0 0 0 -0 0</pose>
+        <cast_shadows>0</cast_shadows>
         <geometry>
           <box>
-            <size>10 600 1</size>
+            <size>200 1000 0.1</size>
           </box>
         </geometry>
         <material>
-          <lighting>1</lighting>
           <script>
-            <uri>file://media/materials/scripts/gazebo.material</uri>
-            <name>Gazebo/Grey</name>
+            <uri>model://asphalt_plane/materials/scripts</uri>
+            <uri>model://asphalt_plane/materials/textures</uri>
+            <name>vrc/asphalt</name>
           </script>
           <shader type='pixel'>
             <normal_map>__default__</normal_map>
           </shader>
-          <ambient>0.3 0.3 0.3 1</ambient>
-          <diffuse>0.7 0.7 0.7 1</diffuse>
-          <specular>0.01 0.01 0.01 1</specular>
+          <ambient>0.5 0.5 0.5 1</ambient>
+          <diffuse>0.5 0.5 0.5 1</diffuse>
+          <specular>0.2 0.2 0.2 1</specular>
           <emissive>0 0 0 1</emissive>
         </material>
+        <pose>0 0 0 0 -0 0</pose>
         <transparency>0</transparency>
-        <cast_shadows>1</cast_shadows>
       </visual>
       <collision name='collision'>
         <laser_retro>0</laser_retro>
@@ -49,7 +49,7 @@
         <pose>0 0 0 0 -0 0</pose>
         <geometry>
           <box>
-            <size>10 600 1</size>
+            <size>20 20 0.1</size>
           </box>
         </geometry>
         <surface>
@@ -99,7 +99,7 @@
         </surface>
       </collision>
     </link>
-    <static>0</static>
+    <static>1</static>
     <allow_auto_disable>1</allow_auto_disable>
   </model>
 </sdf>

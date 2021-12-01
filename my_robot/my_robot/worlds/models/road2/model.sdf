@@ -49,7 +49,7 @@
         <pose>0 0 0 0 -0 0</pose>
         <geometry>
           <box>
-            <size>10 600 1</size>
+            <size>1 1 1</size>
           </box>
         </geometry>
         <surface>
