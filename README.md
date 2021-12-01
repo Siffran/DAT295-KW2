@@ -8,6 +8,7 @@
 ## Copy folders to your catkin_ws/src/
 ## Copy models to your gazebo root
 cd to my_robot/worlds
+
 cp models  ~/.gazebo/models -r
 
 ## Dependencies
