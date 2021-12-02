@@ -13,7 +13,7 @@ def control_wheels(value):
 
     rate = rospy.Rate(2) # 10hz
     rate.sleep()
-    move = value
+    move = -value
     rospy.loginfo(move)
     pub1.publish(move)
     pub2.publish(move)

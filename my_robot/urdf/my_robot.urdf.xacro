@@ -4,8 +4,12 @@
   <xacro:property name="length" value="1" />
   <xacro:property name="width" value="1" />
   <xacro:property name="height" value="0.5" />
-  <xacro:property name="length_wheel" value="0.2" />
-  <xacro:property name="radius_wheel" value="0.2" />
+  <xacro:property name="length_wheel_disc" value="0.01" />
+  <xacro:property name="radius_wheel_disc" value="0.15" />
+  <xacro:property name="length_wheel" value="0.11" />
+  <xacro:property name="radius_wheel" value="0.12" />
+  <xacro:property name="wheel_offset" value="0.505" />
+
 
   <xacro:macro name="default_inertial" params="mass">
     <inertial>
@@ -94,13 +98,16 @@
   <link name="wheel_1">
     <visual>
             <geometry>
-                <cylinder length="${length_wheel}" radius="${radius_wheel}"/>
+                <cylinder length="${length_wheel_disc}" radius="${radius_wheel_disc}"/>
             </geometry>
         <origin rpy="0 0 0" xyz="0 0 0"/>
-        <material name="black">
-            <color rgba="0 0 0 1"/>
-        </material>
     </visual>
+    <visual>
+      <geometry>
+          <cylinder length="${length_wheel}" radius="${radius_wheel}"/>
+      </geometry>
+      <origin rpy="0 0 0" xyz="0 0 0.055"/>
+</visual>
     <collision>
         <geometry>
                 <cylinder length="${length_wheel}" radius="${radius_wheel}"/>
@@ -109,16 +116,21 @@
     <xacro:default_inertial mass="3"/>
 </link>
 
+
+
 <link name="wheel_2">
   <visual>
           <geometry>
-              <cylinder length="${length_wheel}" radius="${radius_wheel}"/>
+              <cylinder length="${length_wheel_disc}" radius="${radius_wheel_disc}"/>
           </geometry>
       <origin rpy="0 0 0" xyz="0 0 0"/>
-      <material name="black">
-          <color rgba="0 0 0 1"/>
-      </material>
   </visual>
+  <visual>
+    <geometry>
+        <cylinder length="${length_wheel}" radius="${radius_wheel}"/>
+    </geometry>
+    <origin rpy="0 0 0" xyz="0 0 -0.055"/>
+</visual>
   <collision>
       <geometry>
               <cylinder length="${length_wheel}" radius="${radius_wheel}"/>
@@ -126,17 +138,21 @@
   </collision>
   <xacro:default_inertial mass="3"/>
 </link>
+
 
 <link name="wheel_3">
   <visual>
           <geometry>
-              <cylinder length="${length_wheel}" radius="${radius_wheel}"/>
+              <cylinder length="${length_wheel_disc}" radius="${radius_wheel_disc}"/>
           </geometry>
       <origin rpy="0 0 0" xyz="0 0 0"/>
-      <material name="black">
-          <color rgba="0 0 0 1"/>
-      </material>
   </visual>
+  <visual>
+    <geometry>
+        <cylinder length="${length_wheel}" radius="${radius_wheel}"/>
+    </geometry>
+    <origin rpy="0 0 0" xyz="0 0 0.055"/>
+</visual>
   <collision>
       <geometry>
               <cylinder length="${length_wheel}" radius="${radius_wheel}"/>
@@ -145,16 +161,20 @@
   <xacro:default_inertial mass="3"/>
 </link>
 
+
 <link name="wheel_4">
   <visual>
           <geometry>
-              <cylinder length="${length_wheel}" radius="${radius_wheel}"/>
+              <cylinder length="${length_wheel_disc}" radius="${radius_wheel_disc}"/>
           </geometry>
       <origin rpy="0 0 0" xyz="0 0 0"/>
-      <material name="black">
-          <color rgba="0 0 0 1"/>
-      </material>
   </visual>
+  <visual>
+    <geometry>
+        <cylinder length="${length_wheel}" radius="${radius_wheel}"/>
+    </geometry>
+    <origin rpy="0 0 0" xyz="0 0 -0.055"/>
+</visual>
   <collision>
       <geometry>
               <cylinder length="${length_wheel}" radius="${radius_wheel}"/>
@@ -196,28 +216,28 @@
   <joint name="base_to_wheel1" type="continuous">
     <parent link="base_link"/>
     <child link="wheel_1"/>
-    <origin rpy="0 -1.5707 0" xyz="0.6 0.4 0"/>
+    <origin rpy="0 1.5707 0" xyz="${wheel_offset} 0.4 0"/>
     <axis xyz="0 0 1" />
   </joint>
 
   <joint name="base_to_wheel2" type="continuous">
     <parent link="base_link"/>
     <child link="wheel_2"/>
-    <origin rpy="0 -1.5707 0" xyz="-0.6 0.4 0"/>
+    <origin rpy="0 1.5707 0" xyz="${-wheel_offset} 0.4 0"/>
     <axis xyz="0 0 1" />
   </joint>
 
   <joint name="base_to_wheel3" type="continuous">
     <parent link="base_link"/>
     <child link="wheel_3"/>
-    <origin rpy="0 -1.5707 0" xyz="0.6 -0.4 0"/>
+    <origin rpy="0 1.5707 0" xyz="${wheel_offset} -0.4 0"/>
     <axis xyz="0 0 1" />
   </joint>
 
   <joint name="base_to_wheel4" type="continuous">
     <parent link="base_link"/>
     <child link="wheel_4"/>
-    <origin rpy="0 -1.5707 0" xyz="-0.6 -0.4 0"/>
+    <origin rpy="0 1.5707 0" xyz="${-wheel_offset} -0.4 0"/>
     <axis xyz="0 0 1" />
   </joint>
 
@@ -277,7 +297,7 @@
   <mu2 value="100.0"/>
   <kp value="10000000.0" />
   <kd value="1.0" />
-  <material>Gazebo/Grey</material>
+  <material>Gazebo/Yellow</material>
 </gazebo>
 
 <gazebo reference="wheel_2">
@@ -285,7 +305,7 @@
   <mu2 value="100.0"/>
   <kp value="10000000.0" />
   <kd value="1.0" />
-  <material>Gazebo/Grey</material>
+  <material>Gazebo/Yellow</material>
 </gazebo>
 
 <gazebo reference="wheel_3">
@@ -293,7 +313,7 @@
   <mu2 value="100.0"/>
   <kp value="10000000.0" />
   <kd value="1.0" />
-  <material>Gazebo/Grey</material>
+  <material>Gazebo/Yellow</material>
 </gazebo>
 
 <gazebo reference="wheel_4">
@@ -301,7 +321,7 @@
   <mu2 value="100.0"/>
   <kp value="10000000.0" />
   <kd value="1.0" />
-  <material>Gazebo/Grey</material></gazebo>
+  <material>Gazebo/Yellow</material></gazebo>
   <!-- Gazebo plugin for ROS Control -->
   <gazebo>
     <plugin name="gazebo_ros_control" filename="libgazebo_ros_control.so">
