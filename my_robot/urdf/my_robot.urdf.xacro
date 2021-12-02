@@ -273,20 +273,35 @@
 </gazebo>
 
 <gazebo reference="wheel_1">
-    <material>Gazebo/Black</material>
+  <mu1 value="200.0"/>
+  <mu2 value="100.0"/>
+  <kp value="10000000.0" />
+  <kd value="1.0" />
+  <material>Gazebo/Grey</material>
 </gazebo>
 
 <gazebo reference="wheel_2">
-    <material>Gazebo/Black</material>
+  <mu1 value="200.0"/>
+  <mu2 value="100.0"/>
+  <kp value="10000000.0" />
+  <kd value="1.0" />
+  <material>Gazebo/Grey</material>
 </gazebo>
 
 <gazebo reference="wheel_3">
-    <material>Gazebo/Black</material>
+  <mu1 value="200.0"/>
+  <mu2 value="100.0"/>
+  <kp value="10000000.0" />
+  <kd value="1.0" />
+  <material>Gazebo/Grey</material>
 </gazebo>
 
 <gazebo reference="wheel_4">
-    <material>Gazebo/Black</material>
-</gazebo>
+  <mu1 value="200.0"/>
+  <mu2 value="100.0"/>
+  <kp value="10000000.0" />
+  <kd value="1.0" />
+  <material>Gazebo/Grey</material></gazebo>
   <!-- Gazebo plugin for ROS Control -->
   <gazebo>
     <plugin name="gazebo_ros_control" filename="libgazebo_ros_control.so">
