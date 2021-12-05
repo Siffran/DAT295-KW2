@@ -5,7 +5,7 @@ from std_msgs.msg import Float64
 
 import sys # for passing arguments through console
 
-def control_wheels(value):
+def control_wheels(velocity):
     pub1 = rospy.Publisher('/my_robot/joint_wheel_1_controller/command', Float64, queue_size=10)
     pub2 = rospy.Publisher('/my_robot/joint_wheel_2_controller/command', Float64, queue_size=10)
 
@@ -13,7 +13,7 @@ def control_wheels(value):
 
     rate = rospy.Rate(2) # 10hz
     rate.sleep()
-    move = -value
+    move = -velocity
     rospy.loginfo(move)
     pub1.publish(move)
     pub2.publish(move)
@@ -26,4 +26,4 @@ if __name__ == '__main__':
         pass
     except IndexError:
         print("IndexError")
-        control_wheels(1)
+        control_wheels(0)

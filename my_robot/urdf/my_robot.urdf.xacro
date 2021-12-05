@@ -15,7 +15,10 @@
     <inertial>
       <origin rpy="0.0 0 0" xyz="0 0 0"/>
       <mass value="${mass}" />
-      <inertia ixx="0.0" ixy="0.0" ixz="0.0" iyy="1.0" iyz="0.0" izz="0.0" />
+      <!--<inertia ixx="0.0" ixy="0.0" ixz="0.0" iyy="1.0" iyz="0.0" izz="0.0" />-->
+      <inertia ixx="1.0" ixy="0.0" ixz="0.0"
+               iyy="1.0" iyz="0.0"
+               izz="1.0" />
     </inertial>
   </xacro:macro>
 <!--
@@ -63,7 +66,7 @@
 -->
 
 <link name="base_footprint">
-  <visual> 
+  <visual>
     <origin rpy="0 0 0" xyz="0 0 0"/>
     <geometry>
       <box size="0 0 0"/>
@@ -80,7 +83,7 @@
 
 
   <link name="base_link">
-    <visual> 
+    <visual>
       <origin rpy="0 0 0" xyz="0 0 0"/>
       <geometry>
         <box size="${length} ${width} ${height/2}"/>
@@ -97,22 +100,33 @@
 
   <link name="wheel_1">
     <visual>
-            <geometry>
-                <cylinder length="${length_wheel_disc}" radius="${radius_wheel_disc}"/>
-            </geometry>
-        <origin rpy="0 0 0" xyz="0 0 0"/>
+      <geometry>
+        <cylinder length="${length_wheel_disc}" radius="${radius_wheel_disc}"/>
+      </geometry>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
     </visual>
+
     <visual>
       <geometry>
-          <cylinder length="${length_wheel}" radius="${radius_wheel}"/>
+        <cylinder length="${length_wheel}" radius="${radius_wheel}"/>
       </geometry>
       <origin rpy="0 0 0" xyz="0 0 0.055"/>
-</visual>
+    </visual>
+
     <collision>
-        <geometry>
-                <cylinder length="${length_wheel}" radius="${radius_wheel}"/>
-        </geometry>
+      <geometry>
+        <cylinder length="${length_wheel_disc}" radius="${radius_wheel_disc}"/>
+      </geometry>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
     </collision>
+
+    <collision>
+      <geometry>
+        <cylinder length="${length_wheel}" radius="${radius_wheel}"/>
+      </geometry>
+      <origin rpy="0 0 0" xyz="0 0 0.055"/>
+    </collision>
+
     <xacro:default_inertial mass="3"/>
 </link>
 
@@ -120,66 +134,99 @@
 
 <link name="wheel_2">
   <visual>
-          <geometry>
-              <cylinder length="${length_wheel_disc}" radius="${radius_wheel_disc}"/>
-          </geometry>
-      <origin rpy="0 0 0" xyz="0 0 0"/>
-  </visual>
-  <visual>
     <geometry>
-        <cylinder length="${length_wheel}" radius="${radius_wheel}"/>
+      <cylinder length="${length_wheel_disc}" radius="${radius_wheel_disc}"/>
+    </geometry>
+    <origin rpy="0 0 0" xyz="0 0 0"/>
+  </visual>
+
+  <collision>
+    <geometry>
+      <cylinder length="${length_wheel}" radius="${radius_wheel}"/>
     </geometry>
     <origin rpy="0 0 0" xyz="0 0 -0.055"/>
-</visual>
-  <collision>
-      <geometry>
-              <cylinder length="${length_wheel}" radius="${radius_wheel}"/>
-      </geometry>
   </collision>
+
+  <visual>
+    <geometry>
+      <cylinder length="${length_wheel}" radius="${radius_wheel}"/>
+    </geometry>
+    <origin rpy="0 0 0" xyz="0 0 -0.055"/>
+  </visual>
+
+  <collision>
+    <geometry>
+      <cylinder length="${length_wheel_disc}" radius="${radius_wheel_disc}"/>
+    </geometry>
+    <origin rpy="0 0 0" xyz="0 0 0"/>
+  </collision>
+
   <xacro:default_inertial mass="3"/>
 </link>
 
 
 <link name="wheel_3">
   <visual>
-          <geometry>
-              <cylinder length="${length_wheel_disc}" radius="${radius_wheel_disc}"/>
-          </geometry>
-      <origin rpy="0 0 0" xyz="0 0 0"/>
-  </visual>
-  <visual>
     <geometry>
-        <cylinder length="${length_wheel}" radius="${radius_wheel}"/>
+      <cylinder length="${length_wheel_disc}" radius="${radius_wheel_disc}"/>
+    </geometry>
+    <origin rpy="0 0 0" xyz="0 0 0"/>
+  </visual>
+
+  <collision>
+    <geometry>
+      <cylinder length="${length_wheel}" radius="${radius_wheel}"/>
     </geometry>
     <origin rpy="0 0 0" xyz="0 0 0.055"/>
-</visual>
-  <collision>
-      <geometry>
-              <cylinder length="${length_wheel}" radius="${radius_wheel}"/>
-      </geometry>
   </collision>
+
+  <visual>
+    <geometry>
+      <cylinder length="${length_wheel}" radius="${radius_wheel}"/>
+    </geometry>
+    <origin rpy="0 0 0" xyz="0 0 0.055"/>
+  </visual>
+
+  <collision>
+    <geometry>
+      <cylinder length="${length_wheel_disc}" radius="${radius_wheel_disc}"/>
+    </geometry>
+    <origin rpy="0 0 0" xyz="0 0 0"/>
+  </collision>
+
   <xacro:default_inertial mass="3"/>
 </link>
 
 
 <link name="wheel_4">
   <visual>
-          <geometry>
-              <cylinder length="${length_wheel_disc}" radius="${radius_wheel_disc}"/>
-          </geometry>
-      <origin rpy="0 0 0" xyz="0 0 0"/>
-  </visual>
-  <visual>
     <geometry>
-        <cylinder length="${length_wheel}" radius="${radius_wheel}"/>
+      <cylinder length="${length_wheel_disc}" radius="${radius_wheel_disc}"/>
+    </geometry>
+    <origin rpy="0 0 0" xyz="0 0 0"/>
+  </visual>
+
+  <collision>
+    <geometry>
+      <cylinder length="${length_wheel}" radius="${radius_wheel}"/>
     </geometry>
     <origin rpy="0 0 0" xyz="0 0 -0.055"/>
-</visual>
-  <collision>
-      <geometry>
-              <cylinder length="${length_wheel}" radius="${radius_wheel}"/>
-      </geometry>
   </collision>
+
+  <visual>
+    <geometry>
+      <cylinder length="${length_wheel}" radius="${radius_wheel}"/>
+    </geometry>
+    <origin rpy="0 0 0" xyz="0 0 -0.055"/>
+  </visual>
+
+  <collision>
+    <geometry>
+      <cylinder length="${length_wheel_disc}" radius="${radius_wheel_disc}"/>
+    </geometry>
+    <origin rpy="0 0 0" xyz="0 0 0"/>
+  </collision>
+
   <xacro:default_inertial mass="3"/>
 </link>
 
@@ -283,15 +330,15 @@
     <origin rpy="0.0 0.0 ${pi}" xyz="0.0 0.2 0.175"/>
     <axis xyz="0 0 1" />
   </joint>
-  
+
   <joint name="base_to_camera" type="continuous">
     <parent link="base_link"/>
     <child link="camera_link"/>
     <origin rpy="0.0 0.0 ${pi/2}" xyz="0.2 0.2 0.175"/>
     <axis xyz="0 0 1" />
   </joint>
-  
- 
+
+
   <transmission name="tran2">
     <type>transmission_interface/SimpleTransmission</type>
     <joint name="my_robot_base">
@@ -395,7 +442,7 @@
       <pose>0 0 0 0 0 0</pose>
     </sensor>
   </gazebo>
-  
+
     <!-- Gazebo plugin for laser scan sensor-->
   <gazebo reference="laserscan_link">
     <mu1>0.2</mu1>
@@ -437,14 +484,14 @@
       </plugin>
     </sensor>
   </gazebo>
-  
+
   <!-- camera -->
    <gazebo reference="camera_link">
     <mu1>0.2</mu1>
     <mu2>0.2</mu2>
     <material>Gazebo/Yellow</material>
   </gazebo>
-  
+
   <gazebo reference="camera_link">
     <sensor type="camera" name="camera1">
       <update_rate>30.0</update_rate>

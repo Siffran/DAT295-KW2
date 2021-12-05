@@ -8,12 +8,14 @@ my_robot:
   joint_wheel_1_controller:
     type: effort_controllers/JointVelocityController
     joint: base_to_wheel1
-    pid: {p: 500.0, i: 50.0, d: 0.01}
+    #pid: {p: 500.0, i: 50.0, d: 0.01}
+    pid: {p: 5.0, i: 20.0, d: 0.0}
   # Velocity Controllers -----------------------------------------
   joint_wheel_2_controller:
     type: effort_controllers/JointVelocityController
     joint: base_to_wheel2
-    pid: {p: 500.0, i: 50.0, d: 0.01}
+    #pid: {p: 500.0, i: 50.0, d: 0.01}
+    pid: {p: 5.0, i: 20.0, d: 0.0}
   # Position Controllers ---------------------------------------
   #my_robot_x_position_controller:
   #  type: effort_controllers/JointPositionController
