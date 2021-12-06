@@ -11,7 +11,7 @@ def control_wheels(velocity):
 
     rospy.init_node('control', anonymous=True)
 
-    rate = rospy.Rate(2) # 10hz
+    rate = rospy.Rate(2) # 2hz
     rate.sleep()
     move = -velocity
     rospy.loginfo(move)
