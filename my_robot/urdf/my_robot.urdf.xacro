@@ -537,6 +537,7 @@
         <focalLength>0.0</focalLength>
       </plugin>
     </sensor>
+    
   </gazebo>
 
 </robot>
