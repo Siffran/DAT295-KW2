@@ -16,6 +16,13 @@ class Subsystem_B:
         self.wheel2_turns = 0
         self.distance_wheel_encoder = 0
         self.distance = 0
+        self.acc_x = 0
+        self.acc_y = 0
+        self.vel_x = 0
+        self.pos_x = 0
+        self.vel_y = 0
+        self.pos_y = 0
+        self.prev_time = 0
 
 
     def control_wheels(self, velocity):
@@ -30,7 +37,29 @@ class Subsystem_B:
         pub2.publish(move)
 
     def read_IMU_acc(self, data):
-        rospy.loginfo("Yacc: {}".format(data.linear_acceleration.y))
+        quaternion = (
+            data.orientation.x,
+            data.orientation.y,
+            data.orientation.z,
+            data.orientation.w)
+        euler = tf.transformations.euler_from_quaternion(quaternion)
+        roll = euler [0]
+        pitch = euler[1]
+
+        self.acc_x = (data.linear_acceleration.x + 9.81 * math.sin(pitch)) * math.cos(pitch);
+        self.acc_y = (data.linear_acceleration.y - 9.81 * math.sin(roll))  * math.cos(roll);
+
+        time = rospy.get_time()
+        dt = time - self.prev_time
+        self.prev_time = time
+
+        Velocity_old_x = self.vel_x
+        self.vel_x = Velocity_old_x+self.acc_x*dt
+        self.pos_x += self.vel_x*dt
+
+        Velocity_old_y = self.vel_y
+        self.vel_y = Velocity_old_y+self.acc_y*dt
+        self.pos_y += self.vel_y*dt
 
     def update_wheel_turns(self, data):
         pose = data.pose[data.name.index('robot::wheel_1')]
@@ -46,7 +75,7 @@ class Subsystem_B:
             self.wheel1_new_turn = False
         elif pitch >= 0:
             self.wheel1_new_turn = True
-        
+
         self.distance_wheel_encoder = 2*math.pi*self.WHEEL_RADIUS*self.wheel1_turns
 
 
@@ -58,13 +87,14 @@ class Subsystem_B:
         pass
 
 
-            
+
 if __name__ == '__main__':
     try:
         subsystem_b = Subsystem_B()
         rospy.init_node('subsystem_b', anonymous=True)
         subsystem_b.control_wheels(float(sys.argv[1]))
-        #rospy.Subscriber("/imu", Imu, subsystem_b.read_IMU_acc)
+        subsystem_b.prev_time = rospy.get_time()
+        rospy.Subscriber("/imu", Imu, subsystem_b.read_IMU_acc)
         #rospy.Subscriber("/joint_states", JointState, subsystem_b.update_wheel_positions)
         rospy.Subscriber("/gazebo/link_states", gazebo_msgs.msg.LinkStates, subsystem_b.update_wheel_turns)
         rospy.Subscriber("/gazebo/model_states", gazebo_msgs.msg.ModelStates, subsystem_b.update_position)
@@ -72,6 +102,8 @@ if __name__ == '__main__':
         while not rospy.is_shutdown():
             print("Actual:{}".format(subsystem_b.distance))
             print("Wheel encoder:{}".format(subsystem_b.distance_wheel_encoder))
+            print("Vel Y:{}".format(subsystem_b.vel_y))
+            print("Pos Y:{}".format(subsystem_b.pos_y))
             rate.sleep()
         rospy.spin()
     except rospy.ROSInterruptException:
