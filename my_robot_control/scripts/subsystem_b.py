@@ -11,10 +11,10 @@ import tf
 class Subsystem_B:
     WHEEL_RADIUS = 0.12
     def __init__(self):
-        self.wheel1_turns = -0.5
+        self.wheel1_turns = 0#-0.5    # 
         self.wheel1_new_turn = True
         self.wheel2_turns = 0
-        self.distance_wheel_encoder = 0
+        self.distance_wheel_encoder = 0 
         self.distance = 0
         self.acc_x = 0
         self.acc_y = 0
@@ -23,6 +23,11 @@ class Subsystem_B:
         self.vel_y = 0
         self.pos_y = 0
         self.prev_time = 0
+        self.prev_degree = 180
+        self.degree = 0
+        self.quadrant = 0
+        self.part_circ = 0
+        self.prev_part_circ = 0
 
 
     def control_wheels(self, velocity):
@@ -61,6 +66,24 @@ class Subsystem_B:
         self.vel_y = Velocity_old_y+self.acc_y*dt
         self.pos_y += self.vel_y*dt
 
+    def pitch_to_degree(self, pitch):
+        t_degree = (pitch*180)/math.pi
+
+        if t_degree >= 0 and t_degree <= self.prev_degree:
+            self.quadrant = 2
+            self.degree = 180 - t_degree
+        elif t_degree < 0 and t_degree <= self.prev_degree:
+            self.quadrant = 3
+            self.degree = 180 - t_degree
+        elif t_degree < 0 and t_degree > self.prev_degree:
+            self.quadrant = 4
+            self.degree = 360 + t_degree
+        elif t_degree >= 0 and t_degree > self.prev_degree:
+            self.quadrant = 1
+            self.degree = t_degree
+
+        self.prev_degree = t_degree
+
     def update_wheel_turns(self, data):
         pose = data.pose[data.name.index('robot::wheel_1')]
         quaternion = (
@@ -70,13 +93,18 @@ class Subsystem_B:
             pose.orientation.w)
         euler = tf.transformations.euler_from_quaternion(quaternion)
         pitch = euler[1]
-        if pitch < 0 and self.wheel1_new_turn:
-            self.wheel1_turns += 1
-            self.wheel1_new_turn = False
-        elif pitch >= 0:
-            self.wheel1_new_turn = True
+        
+        self.pitch_to_degree(pitch)
+        self.part_circ = 2*math.pi*self.WHEEL_RADIUS* (self.degree/360)
 
-        self.distance_wheel_encoder = 2*math.pi*self.WHEEL_RADIUS*self.wheel1_turns
+        if self.prev_part_circ > self.part_circ:
+            self.wheel1_turns += 1
+
+        self.prev_part_circ = self.part_circ
+
+        self.distance_wheel_encoder = 2*math.pi*self.WHEEL_RADIUS*self.wheel1_turns \
+                    + self.part_circ \
+                        -2*math.pi*self.WHEEL_RADIUS/4 # correction
 
 
     def update_position(self, data):
@@ -98,16 +126,16 @@ if __name__ == '__main__':
         #rospy.Subscriber("/joint_states", JointState, subsystem_b.update_wheel_positions)
         rospy.Subscriber("/gazebo/link_states", gazebo_msgs.msg.LinkStates, subsystem_b.update_wheel_turns)
         rospy.Subscriber("/gazebo/model_states", gazebo_msgs.msg.ModelStates, subsystem_b.update_position)
-        rate = rospy.Rate(1)
+        rate = rospy.Rate(10)
         while not rospy.is_shutdown():
             print("Actual:{}".format(subsystem_b.distance))
             print("Wheel encoder:{}".format(subsystem_b.distance_wheel_encoder))
-            print("Vel Y:{}".format(subsystem_b.vel_y))
-            print("Pos Y:{}".format(subsystem_b.pos_y))
+            #print("Vel Y:{}".format(subsystem_b.vel_y))
+            #print("Pos Y:{}".format(subsystem_b.pos_y))
             rate.sleep()
         rospy.spin()
     except rospy.ROSInterruptException:
         pass
     except IndexError:
         print("IndexError")
-        subsystem_b.control_wheels_twist(1)
+        subsystem_b.control_wheels(1)
