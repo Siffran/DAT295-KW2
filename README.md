@@ -12,12 +12,9 @@ cd to my_robot/worlds
 cp models  ~/.gazebo/models -r
 
 # OPTIONAL - create a soft link instead
-# 1 remove folder /home/<user>/.gazebo/models
-
-# 2 Create a softlink from our models to gazebo
-
-# For me the command looks like this: 
-# ln -s /home/dabe/catkin_ws/src/DAT295-KW2/my_robot/worlds/models /home/dabe/.gazebo
+- 1 remove folder /home/<user>/.gazebo/models
+- 2 Create a softlink from our models to gazebo
+For me the command looks like this: ln -s /home/dabe/catkin_ws/src/DAT295-KW2/my_robot/worlds/models /home/dabe/.gazebo
 
 ## Dependencies
 Make sure that you have installed all dependencies. *(you might be missing gazebo_ros_control)*
