@@ -8,6 +8,14 @@ Move to directory:
 cd ~/YOUR_PATH/catkin_ws/src/my_robot_control/scripts
 ```
 
+Execute the file pole_count.py
+```
+python3 pole_count.py
+```
+Move to directory:
+```
+cd ~/YOUR_PATH/catkin_ws/src/my_robot_control/scripts
+```
 Execute the file control.py with arguments x and y.
 ```
 python3 control.py 'X' 'Y'
