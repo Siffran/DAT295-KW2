@@ -1,13 +1,15 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-from sensor_msgs.msg import LaserScan
+from sensor_msgs.msg import LaserScan, Imu
+from gazebo_msgs.srv import GetModelState
 import rospy
-def callback(data):
-	global n,flag
-	# output the pole number that the robot has passed
-	print(n)
-	#read the range matrix of the laser scan sensor. The range matrix contains 720 samples distributed in the angle range of -pi/2 to pi/2. The range[360] corresponds to the distance of the obstacle in the scan angle 0, which is x direction. Therefore, when range[360] is lower than 5, the robot is passing a pole.
+import message_filters
+
+
+def callback(laser, imu):
+	
+	global n, flag
 	
 	'''
 	### Possible extension: 
@@ -33,19 +35,53 @@ def callback(data):
 
 	'''
 
-	distance = data.ranges[360]
+	# Read the range matrix of the laser scan sensor. The range matrix contains 720 samples distributed in 
+	# the angle range of -pi/2 to pi/2. The range[360] corresponds to the distance of the obstacle in the 
+	# scan angle 0, which is x direction. Therefore, when range[360] is lower than 5, the robot is passing a pole.
+	distance = laser.ranges[360]
+
 	if (distance<5) & (flag):
+
+		# Get gazebo (real) position
+		model_state = rospy.ServiceProxy('/gazebo/get_model_state', GetModelState)
+		robot_coordinates = model_state('robot', '')
+
 		n = n+1
 		flag = False
+
+		polesPassed(n) # Output the pole number that the robot has passed
+		print("Acceleration from IMY Y: ", imu.linear_acceleration.y)
+		print("Estimated Position Y: TODO")
+		print("Actual Position Y: ", robot_coordinates.pose.position.y)
+		print()
+		
 	if (flag==False) & (distance>5):
 		flag = True
 		
+def polesPassed(poles):
+	print("Number of poles passed: ", poles)
 
 if __name__ == '__main__':
 	global n,flag
 	n = 0
 	flag = True
-	rospy.init_node('laser_listener', anonymous=True)
-	rospy.Subscriber('/rrbot/laser/scan', LaserScan, callback)
+
+	rospy.init_node('sensor_listener', anonymous=True)
+
+	laser_sub = message_filters.Subscriber('/rrbot/laser/scan', LaserScan)
+	imu_sub = message_filters.Subscriber('/imu', Imu)
+
+	ts = message_filters.TimeSynchronizer([laser_sub, imu_sub], 10)
+	ts.registerCallback(callback)
+
+	# Get initial position (use this as offset later?)
+	model_state = rospy.ServiceProxy('/gazebo/get_model_state', GetModelState)
+	robot_coordinates = model_state('robot', '')
+
+	polesPassed(n)
+	print("Starting Position Y: ", robot_coordinates.pose.position.y)
+	print("Estimated Position Y: TODO")
+	print()
+	
 	rospy.spin()
 
