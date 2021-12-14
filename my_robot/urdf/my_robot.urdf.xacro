@@ -468,55 +468,20 @@
     </sensor>
   </gazebo>
 
-  <!-- Gazebo plugin for GPS
-  <gazebo reference="gps_link">
-    <gravity>true</gravity>
-    <sensor name="imu_sensor" type="imu">
-      <always_on>true</always_on>
-      <update_rate>40</update_rate>
-      <visualize>false</visualize>
-      <topic>__default_topic__</topic>
-      <plugin filename="libhector_gazebo_ros_gps.so" name="gps_plugin">
-        <topicName>gps</topicName>
-        <bodyName>gps_link</bodyName>
-        <updateRateHZ>50.0</updateRateHZ>
-        <gaussianNoise>0.0</gaussianNoise>
-        <xyzOffset>0 0 0</xyzOffset>
-        <rpyOffset>0 0 0</rpyOffset>
-        <frameName>gps_link</frameName>
-        <initialOrientationAsReference>false</initialOrientationAsReference>
-      </plugin>
-      <pose>0 0 0 0 0 0</pose>
-    </sensor>
-  </gazebo> -->
-
-
   <!-- Plugin for GPS sensor -->
   <gazebo reference="gps_link">
     <material>Gazebo/White</material>
   </gazebo>
 
-  <gazebo>
+  <gazebo> <!--Does not work to put reference to gps_link here, see: https://answers.ros.org/question/44732/gps-hector-gazebo/-->
       <plugin name="gps_sim" filename="libhector_gazebo_ros_gps.so">
         <updateRate>40</updateRate>
-        <!--<robotNamespace>/my_robot</robotNamespace>-->
         <bodyName>gps_link</bodyName>
-        <!--<frameId>${properties['tf_prefix']}/${name}</frameId>-->
         <topicName>gps</topicName>
-        <!--<accelOffset>${properties['accel_offset_x']} ${properties['accel_offset_y']} ${properties['accel_offset_z']}</accelOffset>
-        <accelDrift>${properties['accel_drift_x']} ${properties['accel_drift_y']} ${properties['accel_drift_z']}</accelDrift>
-        <accelGaussianNoise>${properties['accel_noise_x']} ${properties['accel_noise_y']} ${properties['accel_noise_z']}</accelGaussianNoise>
-        <rateOffset>${properties['rate_offset_x']} ${properties['rate_offset_y']} ${properties['rate_offset_z']}</rateOffset>
-        <rateDrift>${properties['rate_drift_x']} ${properties['rate_drift_y']} ${properties['rate_drift_z']}</rateDrift>
-        <rateGaussianNoise>${properties['rate_noise_x']} ${properties['rate_noise_y']} ${properties['rate_noise_z']}</rateGaussianNoise>
-        <yawOffset>${properties['heading_offset']}</yawOffset>
-        <yawDrift>${properties['heading_drift']}</yawDrift>
-        <yawGaussianNoise>${properties['heading_noise']}</yawGaussianNoise>-->
       </plugin>
     </gazebo>
 
-
-<!-- Plugin for GPS sensor 
+<!-- Plugin for GPS sensor (NOT WORKING) Keep for reference though
 <gazebo reference= "gps_link">      
   <controller:hector_gazebo_ros_gps name="quadrotor_gps_sim" plugin="libhector_gazebo_ros_gps.so">
     <alwaysOn>true</alwaysOn>
@@ -530,7 +495,6 @@
     <velocityGaussianNoise>0.0 0.0 0.0</velocityGaussianNoise>
   </controller:hector_gazebo_ros_gps>
 </gazebo> -->
-
 
     <!-- Gazebo plugin for laser scan sensor-->
   <gazebo reference="laserscan_link">
