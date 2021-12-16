@@ -26,7 +26,7 @@ class Subsystem_B:
     def __init__(self):
         #
         self.rate = rospy.Rate(self.RATE_Hz)
-
+        
         # Wheel encoder
         self.wheel1_turns = 0
         self.wheel1_new_turn = True
@@ -58,7 +58,7 @@ class Subsystem_B:
         self.dt = 1/self.RATE_Hz
         self.ekf.x = [0,0,0]  # start values of x = [pos, vel, acc]
         self.ekf.F = eye(3) + array([
-                                    [0, 1, 0],
+                                    [0, 1, 0.5 * self.dt],
                                     [0, 0, 1],
                                     [0, 0, 0]]) * self.dt   # State Transition Function, F @ x = x_new
         self.ekf.R = eye(2)*5   # Measurement Noise Matrix, dim = dim_z x dim_z
@@ -161,14 +161,11 @@ class Subsystem_B:
 
     def HJacobian_at(self, x):
         """ compute Jacobian of H matrix at x for EKF"""
-        return array([[1, self.dt, 0.5*self.dt**2],
-                      [0, 0, 0.5*self.dt**2]])
-        #return array([[1, self.dt],
-        #            [1,self.dt]])
+        return array([[1, self.dt, 0.5*self.dt**2],[0, 0, 1]])              # dim = dim_x x dim_z
 
     def hx(self, x):
         """measurement function"""
-        return x[0] + x[1]*self.dt + 0.5*x[2]*self.dt**2
+        return array([x[0] + x[1]*self.dt + 0.5*x[2]*self.dt**2, x[2]])     # dim = dim_z
 
 if __name__ == '__main__':
     try:
@@ -192,6 +189,13 @@ if __name__ == '__main__':
             "Wheel":[],
             "Actual":[]
         }
+
+        recorded_ekf = {
+            "EKF_pos":[],
+            "EKF_vel":[],
+            "EKF_acc":[],
+            "Actual":[]
+        }
         while i < steps:
             print("Actual:{}".format(subsystem_b.pos_y_actual))
             print("Wheel encoder:{}".format(subsystem_b.pos_y_wheel_encoder))
@@ -204,10 +208,15 @@ if __name__ == '__main__':
 
             print("EKF:{}".format(subsystem_b.ekf.x[0]))
 
-            recorded_positions["EKF"].append(subsystem_b.ekf.x[0])
-            recorded_positions["IMU"].append(subsystem_b.acc_y_imu)
-            recorded_positions["Wheel"].append(subsystem_b.pos_y_wheel_encoder)
-            recorded_positions["Actual"].append(subsystem_b.pos_y_actual)
+            #recorded_positions["EKF"].append(subsystem_b.ekf.x[0])
+            #recorded_positions["IMU"].append(subsystem_b.acc_y_imu)
+            #recorded_positions["Wheel"].append(subsystem_b.pos_y_wheel_encoder)
+            #recorded_positions["Actual"].append(subsystem_b.pos_y_actual)
+
+            recorded_ekf["EKF_pos"].append(subsystem_b.ekf.x[0])
+            recorded_ekf["EKF_vel"].append(subsystem_b.ekf.x[1])
+            recorded_ekf["EKF_acc"].append(subsystem_b.ekf.x[2])
+            recorded_ekf["Actual"].append(subsystem_b.pos_y_actual)
 
             subsystem_b.ekf.predict()
 
@@ -216,10 +225,18 @@ if __name__ == '__main__':
         
         subsystem_b.control_wheels(0)
 
-        plt.plot(range(0,steps),recorded_positions["EKF"], label="EKF")
-        plt.plot(range(0,steps),recorded_positions["IMU"], label="IMUacc")
-        plt.plot(range(0,steps),recorded_positions["Wheel"], label="Wheel")
-        plt.plot(range(0,steps),recorded_positions["Actual"], label="Actual")
+        #plt.plot(range(0,steps),recorded_positions["EKF"], label="EKF")
+        #plt.plot(range(0,steps),recorded_positions["IMU"], label="IMUacc")
+        #plt.plot(range(0,steps),recorded_positions["Wheel"], label="Wheel")
+        #plt.plot(range(0,steps),recorded_positions["Actual"], label="Actual")
+        plt.plot(range(0,steps),recorded_ekf["EKF_pos"], label="EKF_pos")
+        plt.plot(range(0,steps),recorded_ekf["EKF_vel"], label="EKF_vel")
+        plt.plot(range(0,steps),recorded_ekf["EKF_acc"], label="EKF_acc")
+        plt.plot(range(0,steps),recorded_ekf["Actual"], label="Actual")
+        plt.xlabel("timesteps")
+        plt.ylabel("position")
+        plt.title("EKF values")
+        #plt.title("Sensor + EKF values")
         plt.legend()
         plt.show()
 
