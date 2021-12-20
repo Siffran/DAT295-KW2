@@ -9,7 +9,7 @@ import message_filters
 
 def callback(laser, imu):
 	
-	global n, flag
+	global n,flag,front_flag,back_flag,direction,discard_next
 	
 	'''
 	### Possible extension: 
@@ -38,33 +38,84 @@ def callback(laser, imu):
 	# Read the range matrix of the laser scan sensor. The range matrix contains 720 samples distributed in 
 	# the angle range of -pi/2 to pi/2. The range[360] corresponds to the distance of the obstacle in the 
 	# scan angle 0, which is x direction. Therefore, when range[360] is lower than 5, the robot is passing a pole.
-	distance = laser.ranges[360]
+	front_distance = min(laser.ranges[230:250]) # since there is more of an angle compared to the middle, sometimes the polling is out of sync and we miss the pole.
+	middle_distance = min(laser.ranges[355:365])
+	back_distance = min(laser.ranges[470:490]) # look at a few rays as to not miss the pole when going fast
+	pole_distance = 5.0
+	side_threshhold = 11.0
 
-	if (distance<5) & (flag):
+	if front_distance != float('inf'):
+		print(f"Front distance: {front_distance}")
+	if middle_distance != float('inf'):
+		print(f"Middle distance: {middle_distance}")
+	if back_distance != float('inf'):
+		print(f"Back distance: {back_distance}")
 
+	if (front_distance < side_threshhold) and front_flag:
+		if not discard_next:
+			print("Direction is now FORWARD")
+			direction = "forward"
+			front_flag = False
+		elif (direction is not None):
+			front_flag = False
+			print("Discarding")
+			discard_next = False
+
+	if (back_distance < side_threshhold ) and back_flag:
+		if not discard_next:
+			print("Direction is now BACKWARDS")
+			direction = "backwards"
+			back_flag = False
+		elif (direction is not None):
+			back_flag = False
+			print("Discarding")
+			discard_next = False
+		
+	if (middle_distance < pole_distance) & (flag):
 		# Get gazebo (real) position
 		model_state = rospy.ServiceProxy('/gazebo/get_model_state', GetModelState)
 		robot_coordinates = model_state('robot', '')
-
-		n = n+1
+		if direction == "forward":
+			n = n+1
+			discard_next = True
+			print("Adding one pole")
+		elif direction == "backwards": 
+			n = n-1
+			discard_next = True
+			print("Removing one pole")
+		else:
+			print("not sure which direction, do nothing")
+			pass # Maybe tie into the IMU here to get the direction
 		flag = False
 
 		polesPassed(n) # Output the pole number that the robot has passed
 		print("Acceleration from IMY Y: ", imu.linear_acceleration.y)
 		print("Estimated Position Y: TODO")
 		print("Actual Position Y: ", robot_coordinates.pose.position.y)
+		print(f"Direction: {direction}")
+		direction = None
 		print()
 		
-	if (flag==False) & (distance>5):
+	if (flag==False) & (middle_distance>5):
 		flag = True
+
+	if not front_flag and (front_distance == float('inf')):
+		front_flag == True
+	
+	if not back_flag and (back_distance == float('inf')):
+		back_flag == True
 		
 def polesPassed(poles):
 	print("Number of poles passed: ", poles)
 
 if __name__ == '__main__':
-	global n,flag
+	global n,flag,front_flag,back_flag,direction,discard_next
 	n = 0
 	flag = True
+	front_flag = True
+	back_flag = True
+	direction = None
+	discard_next = False # This is set if we trigger the front (or back), and then the middle. Discard the trigger on the trailing ray when leaving the area.
 
 	rospy.init_node('sensor_listener', anonymous=True)
 
@@ -81,6 +132,7 @@ if __name__ == '__main__':
 	polesPassed(n)
 	print("Starting Position Y: ", robot_coordinates.pose.position.y)
 	print("Estimated Position Y: TODO")
+	print(f"Direction: {direction}")
 	print()
 	
 	rospy.spin()
