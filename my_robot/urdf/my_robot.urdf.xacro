@@ -248,6 +248,24 @@
   <xacro:default_inertial mass="0.1"/>
 </link>
 
+<link name="gps_link">
+  <visual>
+    <geometry>
+      <box size="0.1 0.1 0.1"/>
+    </geometry>
+    <origin rpy="0 0 0" xyz="0 0 0"/>
+    <material name="black">
+          <color rgba="0 0 0 1"/>
+    </material>
+  </visual>
+  <collision>
+    <geometry>
+      <box size="0.1 0.1 0.1"/>
+    </geometry>
+  </collision>
+  <xacro:default_inertial mass="0.1"/>
+</link>
+
 <link name="laserscan_link">
   <visual>
     <geometry>
@@ -321,6 +339,13 @@
     <parent link="base_link"/>
     <child link="imu_link"/>
     <origin rpy="0.0 0.0 0.0" xyz="0.0 0.0 0.175"/>
+    <axis xyz="0 0 1" />
+  </joint>
+
+  <joint name="base_to_gps" type="continuous">
+    <parent link="base_link"/>
+    <child link="gps_link"/>
+    <origin rpy="0.0 0.0 0.0" xyz="0.0 -0.2 0.175"/>
     <axis xyz="0 0 1" />
   </joint>
 
@@ -442,6 +467,34 @@
       <pose>0 0 0 0 0 0</pose>
     </sensor>
   </gazebo>
+
+  <!-- Plugin for GPS sensor -->
+  <gazebo reference="gps_link">
+    <material>Gazebo/White</material>
+  </gazebo>
+
+  <gazebo> <!--Does not work to put reference to gps_link here, see: https://answers.ros.org/question/44732/gps-hector-gazebo/-->
+      <plugin name="gps_sim" filename="libhector_gazebo_ros_gps.so">
+        <updateRate>40</updateRate>
+        <bodyName>gps_link</bodyName>
+        <topicName>gps</topicName>
+      </plugin>
+    </gazebo>
+
+<!-- Plugin for GPS sensor (NOT WORKING) Keep for reference though
+<gazebo reference= "gps_link">      
+  <controller:hector_gazebo_ros_gps name="quadrotor_gps_sim" plugin="libhector_gazebo_ros_gps.so">
+    <alwaysOn>true</alwaysOn>
+    <updateRate>40.0</updateRate>
+    <bodyName>gps_link</bodyName>
+    <topicName>gps</topicName>
+    <velocityTopicName>gps_vel</velocityTopicName>
+    <drift>0.0 0.0 0.0</drift>
+    <gaussianNoise>0.0 0.0 0.0</gaussianNoise>
+    <velocityDrift>0 0 0</velocityDrift>
+    <velocityGaussianNoise>0.0 0.0 0.0</velocityGaussianNoise>
+  </controller:hector_gazebo_ros_gps>
+</gazebo> -->
 
     <!-- Gazebo plugin for laser scan sensor-->
   <gazebo reference="laserscan_link">
