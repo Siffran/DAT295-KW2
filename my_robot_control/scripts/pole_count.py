@@ -38,9 +38,9 @@ def callback(laser, imu):
 	# Read the range matrix of the laser scan sensor. The range matrix contains 720 samples distributed in 
 	# the angle range of -pi/2 to pi/2. The range[360] corresponds to the distance of the obstacle in the 
 	# scan angle 0, which is x direction. Therefore, when range[360] is lower than 5, the robot is passing a pole.
-	front_distance = min(laser.ranges[320:330]) # since there is more of an angle compared to the middle, sometimes the polling is out of sync and we miss the pole.
+	front_distance = min(laser.ranges[310:330]) # since there is more of an angle compared to the middle, sometimes the polling is out of sync and we miss the pole.
 	middle_distance = min(laser.ranges[350:370]) # bigger range in case of big speed
-	back_distance = min(laser.ranges[390:400]) # look at a few rays as to not miss the pole when going fast
+	back_distance = min(laser.ranges[390:410]) # look at a few rays as to not miss the pole when going fast
 	pole_distance = 5.0
 	side_threshhold = 6.5
 
