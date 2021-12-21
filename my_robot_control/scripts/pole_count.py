@@ -9,22 +9,9 @@ import message_filters
 
 def callback(laser, imu):
 	
-	global n,flag,front_flag,back_flag,direction,discard_next, last_pole_info
+	global n,flag,front_flag,back_flag,direction,last_pole_info
 	
 	'''
-	### Possible extension: 
-
-	Look at 3 angles instead of 1. Lets call them 1 2 3.
-	2 is the angle we currently use at angle 0.
-	1 would be to the left of 2.
-	3 would be to the right of 2.
-
-	This way we could adapt to directional changes of the robot.
-	if we "trigger" in order 1 2 3. We can to the counter.
-	If we "trigger" in order 3 2 1. We cant subtract from the counter.
-
-	When we want to know how many poles we've passed from our starting position we simply take the abs-value of our counter :D
-
 	### Possible extenstion:
 
 	Incorperate IMU and odometry sensors to "map" or provide further accuracy of the pole positions.
@@ -126,13 +113,12 @@ def polesPassed(poles):
 	print("Number of poles passed: ", poles)
 
 if __name__ == '__main__':
-	global n,flag,front_flag,back_flag,direction,discard_next, last_pole_info
+	global n,flag,front_flag,back_flag,direction,last_pole_info
 	n = 0
 	flag = True
 	front_flag = True
 	back_flag = True
 	direction = None
-	discard_next = False # This is set if we trigger the front (or back), and then the middle. Discard the trigger on the trailing ray when leaving the area.
 	last_pole_info = None
 
 	rospy.init_node('sensor_listener', anonymous=True)
