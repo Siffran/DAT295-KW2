@@ -16,7 +16,7 @@ def control_wheels(velocity):
     move = -velocity
     rospy.loginfo(move)
     pub1.publish(move)
-    pub2.publish(move)
+    pub2.publish(-move)
 
 
 if __name__ == '__main__':
