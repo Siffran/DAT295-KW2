@@ -478,6 +478,12 @@
         <updateRate>40</updateRate>
         <bodyName>gps_link</bodyName>
         <topicName>gps</topicName>
+        <referenceLatitude>0.0</referenceLatitude>
+        <referenceLongitude>0.0</referenceLongitude>
+        <drift>0.0 0.0 0.0</drift>
+        <gaussianNoise>0.0 0.0 0.0</gaussianNoise>
+        <velocityDrift>0 0 0</velocityDrift>
+        <velocityGaussianNoise>0.0 0.0 0.0</velocityGaussianNoise>
       </plugin>
     </gazebo>
 
