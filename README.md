@@ -5,6 +5,11 @@
 - http://gazebosim.org/tutorials?tut=ros_control&cat=connect_ros
 - https://www.youtube.com/watch?v=mtSpqObg9X4
 
+## Required Packages
+- sudo apt install python3-pip
+- pip install haversine
+- sudo apt-get install ros-noetic-hector-gazebo-plugins
+
 ## Copy folders to your catkin_ws/src/
 ## Copy models to your gazebo root
 cd to my_robot/worlds
