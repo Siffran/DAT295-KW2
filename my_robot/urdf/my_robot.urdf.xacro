@@ -215,13 +215,13 @@
 <link name="laserscan_link">
   <visual>
     <geometry>
-      <box size="0.1 0.1 0.1"/>
+      <box size="0.1 0.1 0.2"/>
     </geometry>
     <origin rpy="0 0 0" xyz="0 0 0"/>
   </visual>
   <collision>
     <geometry>
-      <box size="0.1 0.1 0.1"/>
+      <box size="0.1 0.1 0.2"/>
     </geometry>
   </collision>
   <xacro:default_inertial mass="0.1"/>
@@ -280,28 +280,28 @@
     <axis xyz="0 0 1" />
   </joint>
 
-  <joint name="base_to_imu" type="continuous">
+  <joint name="base_to_imu" type="fixed">
     <parent link="base_link"/>
     <child link="imu_link"/>
     <origin rpy="0.0 0.0 0.0" xyz="0.0 0.0 0.175"/>
     <axis xyz="0 0 1" />
   </joint>
 
-  <joint name="base_to_gps" type="continuous">
+  <joint name="base_to_gps" type="fixed">
     <parent link="base_link"/>
     <child link="gps_link"/>
     <origin rpy="0.0 0.0 0.0" xyz="0.0 -0.2 0.175"/>
     <axis xyz="0 0 1" />
   </joint>
 
-  <joint name="base_to_laserscan" type="continuous">
+  <joint name="base_to_laserscan" type="fixed">
     <parent link="base_link"/>
     <child link="laserscan_link"/>
-    <origin rpy="0.0 0.0 ${pi}" xyz="0.0 0.2 0.175"/>
+    <origin rpy="0.0 0.0 ${pi}" xyz="0.0 0.2 0.375"/>
     <axis xyz="0 0 1" />
   </joint>
 
-  <joint name="base_to_camera" type="continuous">
+  <joint name="base_to_camera" type="fixed">
     <parent link="base_link"/>
     <child link="camera_link"/>
     <origin rpy="0.0 0.0 ${pi/2}" xyz="0.2 0.2 0.175"/>
