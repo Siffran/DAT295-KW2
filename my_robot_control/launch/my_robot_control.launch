@@ -3,6 +3,10 @@
   <!-- Load joint controller configurations from YAML file to parameter server -->
   <rosparam file="$(find my_robot_control)/config/my_robot_control.yaml" command="load"/>
 
+  <node pkg="robot_state_publisher" type="state_publisher" name="rob_st_pub" >
+  <remap from="robot_description" to="my_robot_description" />
+  </node>
+
   <!-- load the controllers -->
   <!--<node name="controller_spawner_x" pkg="controller_manager" type="spawner" respawn="false"
     output="screen" ns="/my_robot" args="my_robot_x_position_controller joint_state_controller"/>-->
