@@ -58,7 +58,7 @@ class Subsystem_B:
         move = -velocity
         #rospy.loginfo(move)
         pub1.publish(move)
-        pub2.publish(move)
+        pub2.publish(-move)
 
     def read_IMU_acc(self, data):
         quaternion = (
