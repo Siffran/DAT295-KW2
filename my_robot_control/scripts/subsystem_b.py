@@ -123,8 +123,8 @@ class Subsystem_B:
         dist = (2*math.pi*self.WHEEL_RADIUS*self.wheel1_turns \
                     + self.part_circ \
                         -2*math.pi*self.WHEEL_RADIUS/4)
-        self.pos_y_wheel_encoder =  dist * math.sin(self.direction) # correction
-        self.pos_x_wheel_encoder =  dist * math.cos(self.direction) # correction
+        self.pos_y_wheel_encoder += dist * math.sin(self.direction) - self.pos_y_wheel_encoder
+        self.pos_x_wheel_encoder += dist * math.cos(self.direction) - self.pos_x_wheel_encoder
 
 
     def update_position(self, data):
