@@ -48,5 +48,5 @@ chmod +x start.sh
 
 ## Move
 - in rqt-gui
-- change expression on right side 
+- change expression on right side
 - click checkbox on left side
