@@ -24,14 +24,14 @@
 <model name="rail1">
   <include>
     <uri>model://rail</uri>
-    <pose>-0.6 290 0.5 0 0 0</pose>
+    <pose>-0.75 290 0.75 0 0 0</pose>
     <static>true</static>
   </include>
 </model>
 <model name="rail2">
   <include>
     <uri>model://rail</uri>
-    <pose>0.6 290 0.5 0 0 0</pose>
+    <pose>0.75 290 0.75 0 0 0</pose>
     <static>true</static>
 </include>
 </model>
