@@ -1,16 +1,16 @@
 <?xml version="1.0"?>
 <robot xmlns:xacro="http://www.ros.org/wiki/xacro" name="my_robot">
 
-  <xacro:property name="length" value="1" />
+  <xacro:property name="length" value="1.21" />
   <xacro:property name="width" value="1" />
   <xacro:property name="height" value="0.5" />
   <xacro:property name="length_wheel_disc" value="0.01" />
   <xacro:property name="radius_wheel_disc" value="0.15" />
   <xacro:property name="length_wheel" value="0.11" />
   <xacro:property name="radius_wheel" value="0.12" />
-  <xacro:property name="wheel_offset" value="0.505" />
+  <xacro:property name="wheel_offset" value="0.61" />
   <xacro:property name="cone_scale" value="0.5 0.5 0.5" />
-  <xacro:property name="cone_name" value="cone_long.dae" />
+  <xacro:property name="cone_name" value="cone.dae" />
 
 
 
