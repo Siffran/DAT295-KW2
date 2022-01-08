@@ -8,6 +8,7 @@
 ## Required Packages
 - sudo apt install python3-pip
 - pip install haversine
+- pip install filterpy
 - sudo apt-get install ros-noetic-hector-gazebo-plugins
 
 ## Copy folders to your catkin_ws/src/
