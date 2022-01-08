@@ -8,6 +8,29 @@ import gazebo_msgs.msg
 import numpy as np
 from matplotlib import pyplot as plt
 
+'''
+How to solve the problem :)
+
+get all sensor data:
+ - Wheelencoder and IMU
+ - GPS
+ - Laser
+test it
+
+Solve problem of sensors sending data att different frequency
+
+Add sensor data to EKF
+
+Record position, plot estimated vs actual (over time?)
+
+Add (more) noise to sensors
+
+test again
+
+Profit????
+'''
+
+
 wheel_encoder = WheelEncoder()
 imu_x_acc, imu_y_acc, \
     wheel_x, wheel_y, \
