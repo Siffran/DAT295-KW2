@@ -66,6 +66,48 @@
   </include>
 </model>
 
+<!--five lamps parallel to the rail track-->
+<model name="lamp1">
+    <include>
+      <uri>model://lamp_post</uri>
+      <pose>-5 0 0 0 0 1.57</pose>
+      <static>true</static>
+  </include>
+</model>
+
+<model name="lamp2">
+    <include>
+      <uri>model://lamp_post</uri>
+      <pose>-4.5 60 0 0 0 1.57</pose>
+      <static>true</static>
+  </include>
+</model>
+
+<model name="lamp3">
+    <include>
+      <uri>model://lamp_post</uri>
+      <pose>11 120 0 0 0 1.57</pose>
+      <static>true</static>
+  </include>
+</model>
+
+<model name="lamp4">
+    <include>
+      <uri>model://lamp_post</uri>
+      <pose>-2.5 180 0 0 0 1.57</pose>
+      <static>true</static>
+  </include>
+</model>
+
+<model name="lamp5">
+    <include>
+      <uri>model://lamp_post</uri>
+      <pose>-2.5 240 0 0 0 1.57</pose>
+      <static>true</static>
+  </include>
+</model>
+
+
     <population name="tree_population_left">
       <model name="oak_tree_left">
         <include>
@@ -102,7 +144,7 @@
       </distribution>
     </population>
     <!-- automatic population of objects -->
-    <population name="lamp_post_population">
+    <!--<population name="lamp_post_population">
       <model name="lamp_post">
         <include>
           <static>true</static>
@@ -118,7 +160,7 @@
       <distribution>
         <type>linear-y</type>
       </distribution>
-    </population>
+    </population>-->
 
   </world>
 </sdf>
