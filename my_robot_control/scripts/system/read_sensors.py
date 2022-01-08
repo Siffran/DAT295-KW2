@@ -44,7 +44,7 @@ def read_actual_pos(data):
     pos_y_actual = data.pose[data.name.index('robot')].position.y
     return pos_x_actual, pos_y_actual
 
-def gps_position(data):
+def read_gps_pos(data):
     """
     GPS position value extraction from data.
 
