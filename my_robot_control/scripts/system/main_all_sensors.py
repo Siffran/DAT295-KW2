@@ -49,7 +49,7 @@ gps_x = 0.0
 gps_y = 0.0
 
 #def callback(imu_data, wheel_data, actual_data):
-def callback(wheel_data, actual_data):
+def callback(gps_data, actual_data):
     """
     Executes the sensor functions to get current values.
     Called by the TimeSynchonizer.
@@ -59,11 +59,12 @@ def callback(wheel_data, actual_data):
     # MODIFY: Add get function of each sensor in the configuration.
     
     #global imu_x_acc, imu_y_acc, wheel_x, wheel_y, actual_x, actual_y
-    global wheel_x, wheel_y, actual_x, actual_y
+    global gps_x, gps_y, actual_x, actual_y
 
     #imu_x_acc, imu_y_acc = read_imu_acc(imu_data)
-    wheel_encoder.update(wheel_data)
-    wheel_x, wheel_y = wheel_encoder.get_pos()
+    #wheel_encoder.update(wheel_data)
+    #wheel_x, wheel_y = wheel_encoder.get_pos()
+    gps_x, gps_y = read_gps_pos(gps_data)
     actual_x, actual_y = read_actual_pos(actual_data)
     
 if __name__ == "__main__":
@@ -92,11 +93,12 @@ if __name__ == "__main__":
     #         Adjust time intervall in which two values belong to each other (Third value in ApproximateTimeSynchronizer)
     
     #imu_sub = message_filters.Subscriber('/imu', Imu)
-    wheel_sub = message_filters.Subscriber('/gazebo/link_states', gazebo_msgs.msg.LinkStates)
+    #wheel_sub = message_filters.Subscriber('/gazebo/link_states', gazebo_msgs.msg.LinkStates)
+    gps_sub = message_filters.Subscriber('/gps', NavSatFix)
     actual_sub = message_filters.Subscriber('/gazebo/model_states', gazebo_msgs.msg.ModelStates)
 
     #ts = message_filters.ApproximateTimeSynchronizer([imu_sub, wheel_sub, actual_sub], 10, 0.02, True)
-    ts = message_filters.ApproximateTimeSynchronizer([wheel_sub, actual_sub], 10, 0.02, True)
+    ts = message_filters.ApproximateTimeSynchronizer([gps_sub, actual_sub], 10, 0.2, True)
     ts.registerCallback(callback)
 
     # MODIFY: Create instance of Localization estimater.
@@ -104,15 +106,15 @@ if __name__ == "__main__":
     loc_est = LocalizationEstimator("all", RATE_Hz)
 
     # MODIFY: Amount of steps the while loop records values.
-    steps = 2000
+    steps = 500
     i = 0
 
     # MODIFY: Values to record
     recorded_positions = {
         "EKF x":[],
         "EKF y":[],
-        "Wheel x":[],
-        "Wheel y":[],
+        "GPS x":[],
+        "GPS y":[],
         "Actual x":[],
         "Actual y":[]
     }
@@ -121,7 +123,7 @@ if __name__ == "__main__":
     while i <= steps:
 
         # MODIFY: Measurement vector with your sensor values
-        z = np.array([wheel_x, wheel_y, imu_x_acc, imu_y_acc])
+        z = np.array([gps_x, gps_y])
 
         loc_est.update(z)
         loc_est.predict()
@@ -129,9 +131,9 @@ if __name__ == "__main__":
 
         # MODIFY: Append values to record.
         recorded_positions["EKF x"].append(state_vector[0])
-        recorded_positions["EKF y"].append(state_vector[3])
-        recorded_positions["Wheel x"].append(wheel_x)
-        recorded_positions["Wheel y"].append(wheel_y)
+        recorded_positions["EKF y"].append(state_vector[1])
+        recorded_positions["GPS x"].append(gps_x)
+        recorded_positions["GPS y"].append(gps_y)
         recorded_positions["Actual x"].append(actual_x)
         recorded_positions["Actual y"].append(actual_y)
 
@@ -142,9 +144,9 @@ if __name__ == "__main__":
     set_wheel_velocity(0)
 
     # MODIFY: Values to plot.
-    plt.plot(recorded_positions["EKF x"], recorded_positions["EKF y"], label="EKF pos")
-    plt.plot(recorded_positions["Wheel x"], recorded_positions["Wheel y"], label="Wheel pos")
-    plt.plot(recorded_positions["Actual x"], recorded_positions["Actual y"], label="Actual pos")
+    plt.plot(recorded_positions["EKF x"], recorded_positions["EKF y"], 'bo', label="EKF pos")
+    plt.plot(recorded_positions["GPS x"], recorded_positions["GPS y"], color="red", label="GPS pos")
+    plt.plot(recorded_positions["Actual x"], recorded_positions["Actual y"], color="black", label="Actual pos")
     plt.xlabel("x")
     plt.ylabel("y")
     plt.title("EKF values")

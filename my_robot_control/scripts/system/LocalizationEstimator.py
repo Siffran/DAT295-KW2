@@ -95,8 +95,58 @@ class LocalizationEstimator:
     #     return array([x[0] + x[1]*self.dt + 0.5*x[2]*self.dt**2, x[3] + x[4]*self.dt + 0.5*x[5]*self.dt**2, x[2], x[5]])     # dim = dim_z
 
     def setup_all_EKF(self):
-        self.ekf = ExtendedKalmanFilter(dim_x = 4 , dim_z = 2)
+        """
+        Initializes an EKF for all sensors.
+        HINT: Pay attention of the matrix dimensions, they are always noted in a comment !!!
+
+        """
+        self.ekf = ExtendedKalmanFilter(dim_x=4,dim_z=2)
         self.dt = 1/self.RATE_Hz
+
+        # start values of x = [x_pos, y_pos, x_vel, y_vel]
+        self.ekf.x = [0, 0, 0, 0]
+        # Measurement vector z = [gps_x, gps_y]
+        self.z = [0, 0]
+        # State Transition Function, F @ x = x_new, dim_F = dim_x x dim_x
+        # TODO: add angle theta as shown here: https://github.com/rlabbe/Kalman-and-Bayesian-Filters-in-Python/blob/master/11-Extended-Kalman-Filters.ipynb
+        self.ekf.F = eye(4) + array([[0, 0, 1, 0],
+                                     [0, 0, 0, 1],
+                                     [0, 0, 0, 0],
+                                     [0, 0, 0, 0]])*self.dt
+                                     
+        # Measurement Noise Matrix, dim_R = dim_z x dim_z
+        self.ekf.R = np.eye(2) * 5   
+
+        # Create measurement noise matrix. It is assembled by 9 3x3 matrices cause `Q_discrete_white_noise` can't handle 9x9.
+        # dim_Q = dim_x x dim_x 
+        self.ekf.Q = Q_discrete_white_noise(4, var=.01) 
+                                    # Engineering Parameter:
+                                    # small Q: the filter will be overconfident in its prediction model and will diverge from the actual solution
+                                    # large Q: the filter will be unduly influenced by the noise in the measurements and perform sub-optimally
+        
+        # Posterior Covariance, dim_P = dim_x x dim_x   
+        self.ekf.P = eye(4) * 50        
+        
+        # HJacobian creates the H matrix for the update step.
+        # Explained: https://github.com/rlabbe/Kalman-and-Bayesian-Filters-in-Python/blob/master/11-Extended-Kalman-Filters.ipynb
+        self.HJacobian_at = lambda x: array([ [1, 0, self.dt, 0],
+                                              [0, 1, 0, self.dt]])       # dim_HJ = dim_x x dim_z     z = Hx
+
+        # hx is needed for the measurement correction in the update step. 
+        self.hx = lambda x: array([x[0]+x[2]*self.dt, x[1]+x[3]*self.dt]) # dim = dim_z
+
+    # def imu_wheel_HJacobian_at(self, x):
+    #     """ compute Jacobian of H matrix at x for EKF"""
+    #     return array([
+    #                  [1, self.dt, 0.5*self.dt**2, 0, 0, 0, 0, 0, 0],
+    #                  [0, 0, 0, 1, self.dt, 0.5*self.dt**2, 0, 0, 0],
+    #                  [0, 0, 1, 0, 0, 0, 0, 0, 0],
+    #                  [0, 0, 0, 0, 0, 1, 0, 0, 0]
+    #                  ])             
+
+    # def hx(self, x):
+    #     """measurement function"""
+    #     return array([x[0] + x[1]*self.dt + 0.5*x[2]*self.dt**2, x[3] + x[4]*self.dt + 0.5*x[5]*self.dt**2, x[2], x[5]])     # dim = dim_z
 
         
         
