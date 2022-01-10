@@ -136,6 +136,17 @@ class LocalizationEstimator:
                                     # Engineering Parameter:
                                     # small Q: the filter will be overconfident in its prediction model and will diverge from the actual solution
                                     # large Q: the filter will be unduly influenced by the noise in the measurements and perform sub-optimally
+
+        # Posterior Covariance, dim_P = dim_x x dim_x   
+        self.ekf.P *= 50
+
+        # HJacobian creates the H matrix for the update step.
+        # Explained: https://github.com/rlabbe/Kalman-and-Bayesian-Filters-in-Python/blob/master/11-Extended-Kalman-Filters.ipynb
+        self.HJacobian_at = lambda x: array([ [1, 0, self.dt, 0],
+                                              [0, 1, 0, self.dt]])       # dim_HJ = dim_x x dim_z     z = Hx
+
+        # hx is needed for the measurement correction in the update step. 
+        self.hx = lambda x: array([x[0]+x[2]*self.dt, x[1]+x[3]*self.dt]) # dim = dim_z
     def setup_imupos_wheel_EKF(self):
         """
         Initializes an EKF for an IMU and a Wheel Encoder Sensor.
@@ -179,9 +190,7 @@ class LocalizationEstimator:
                                     # large Q: the filter will be unduly influenced by the noise in the measurements and perform sub-optimally
         # Posterior Covariance, dim_P = dim_x x dim_x   
         self.ekf.P = eye(9) * 50        
-        
-        # Posterior Covariance, dim_P = dim_x x dim_x   
-        self.ekf.P *= 50        
+                
         # HJacobian creates the H matrix for the update step.
         # Explained: https://github.com/rlabbe/Kalman-and-Bayesian-Filters-in-Python/blob/master/11-Extended-Kalman-Filters.ipynb
         self.HJacobian_at = lambda x: array([
@@ -193,15 +202,6 @@ class LocalizationEstimator:
 
         # hx is needed for the measurement correction in the update step. 
         self.hx = lambda x: array([x[0], x[3], x[0], x[3]])
-    
-        
-        # HJacobian creates the H matrix for the update step.
-        # Explained: https://github.com/rlabbe/Kalman-and-Bayesian-Filters-in-Python/blob/master/11-Extended-Kalman-Filters.ipynb
-        self.HJacobian_at = lambda x: array([ [1, 0, self.dt, 0],
-                                              [0, 1, 0, self.dt]])       # dim_HJ = dim_x x dim_z     z = Hx
-
-        # hx is needed for the measurement correction in the update step. 
-        self.hx = lambda x: array([x[0]+x[2]*self.dt, x[1]+x[3]*self.dt]) # dim = dim_z
 
     def update(self, z):
         """
