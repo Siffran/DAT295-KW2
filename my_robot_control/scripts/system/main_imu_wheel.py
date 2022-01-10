@@ -1,7 +1,7 @@
 # other software parts
 from control_robot import set_wheel_velocity
 from LocalizationEstimator import LocalizationEstimator
-from read_sensors import read_imu_acc, read_actual_pos, WheelEncoder
+from read_sensors import read_actual_pos, WheelEncoder, IMU
 
 # rospy related
 import rospy
@@ -15,11 +15,13 @@ from matplotlib import pyplot as plt
 
 
 wheel_encoder = WheelEncoder()
+imu= IMU()
 
 # MODIFY: add variable for your sensor, keep pattern "sensor_direction" i.e. wheel_x
-imu_x_acc, imu_y_acc, \
+imu_x_pos, imu_y_pos, \
+    imu_x_acc, imu_y_acc, \
     wheel_x, wheel_y, \
-    actual_x, actual_y = 0, 0, 0, 0, 0, 0
+    actual_x, actual_y = 0, 0, 0, 0, 0, 0, 0, 0
 
 def callback(imu_data, wheel_data, actual_data):
     """
@@ -29,9 +31,10 @@ def callback(imu_data, wheel_data, actual_data):
     """
 
     # MODIFY: Add get function of each sensor in the configuration.
-    global imu_x_acc, imu_y_acc, wheel_x, wheel_y, actual_x, actual_y
+    global imu_x_acc, imu_y_acc, wheel_x, wheel_y, actual_x, actual_y, imu_x_pos, imu_y_pos
 
-    imu_x_acc, imu_y_acc = read_imu_acc(imu_data)
+    imu.update(imu_data, rospy.get_time())
+    imu_x_pos, imu_y_pos = imu.get_pos()
     wheel_encoder.update(wheel_data)
     wheel_x, wheel_y = wheel_encoder.get_pos()
     actual_x, actual_y = read_actual_pos(actual_data)
@@ -69,10 +72,10 @@ if __name__ == "__main__":
 
     # MODIFY: Create instance of Localization estimater.
     #         The setup function has to be created in the LocalizationEstimator.py file
-    loc_est = LocalizationEstimator("imu+wheel", RATE_Hz)
+    loc_est = LocalizationEstimator("imupos+wheel", RATE_Hz)
 
     # MODIFY: Amount of steps the while loop records values.
-    steps = 2000
+    steps = 200
     i = 0
 
     # MODIFY: Values to record
@@ -85,11 +88,12 @@ if __name__ == "__main__":
         "Actual y":[]
     }
 
+    imu.set_prev_time(rospy.get_time())
 
     while i <= steps:
 
         # MODIFY: Measurement vector with your sensor values
-        z = np.array([wheel_x, wheel_y, imu_x_acc, imu_y_acc])
+        z = np.array([wheel_x, wheel_y, imu_x_pos, imu_y_pos])
 
         loc_est.update(z)
         loc_est.predict()
