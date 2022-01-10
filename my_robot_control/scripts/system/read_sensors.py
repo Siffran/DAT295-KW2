@@ -5,31 +5,60 @@ from haversine import Unit
 
 # MODIFY: add your new sensor here. Either as function or class. Depending whats possible.
 
-def read_imu_acc(data):
-    """
-    IMU value conversion from quaternion to accelertion in x or y direction.
+class IMU:
 
-    Input:
-    Imu data, datatype of ros, get by Subscriber
-    Return:
-    int acc_x, acc_y
-    """
+    def __init__(self):
+        self.prev_time = 0
+        self.imu_x_vel = 0
+        self.imu_x_pos = 0
+        self.imu_x_acc = 0
+        self.imu_y_vel = 0
+        self.imu_y_pos = 0
+        self.imu_y_acc = 0
 
-    # transform from quaternion to euler angles
-    quaternion = (
-        data.orientation.x,
-        data.orientation.y,
-        data.orientation.z,
-        data.orientation.w)
-    euler = tf.transformations.euler_from_quaternion(quaternion)
-    roll = euler [0]
-    pitch = euler[1]
+    def update(self, data, time):
+        """
+        IMU value conversion from quaternion to accelertion in x or y direction.
 
-    # calculate actual acceleration from linear_acc by considering gravity
-    acc_x = (data.linear_acceleration.x + 9.81 * math.sin(pitch)) * math.cos(pitch)
-    acc_y = (data.linear_acceleration.y - 9.81 * math.sin(roll))  * math.cos(roll)
+        Input:
+        Imu data, datatype of ros, get by Subscriber
+        """
 
-    return acc_x, acc_y
+        # transform from quaternion to euler angles
+        quaternion = (
+            data.orientation.x,
+            data.orientation.y,
+            data.orientation.z,
+            data.orientation.w)
+        euler = tf.transformations.euler_from_quaternion(quaternion)
+        roll = euler [0]
+        pitch = euler[1]
+
+        # calculate actual acceleration from linear_acc by considering gravity
+        self.imu_x_acc = (data.linear_acceleration.x + 9.81 * math.sin(pitch)) * math.cos(pitch)
+        self.imu_y_acc = (data.linear_acceleration.y - 9.81 * math.sin(roll))  * math.cos(roll)
+
+        # Calculate time step since last measurement
+        dt = time - self.prev_time
+        self.prev_time = time
+
+        # Calculate vel and pos by integrating acc
+        Velocity_old_x = self.imu_x_vel
+        self.imu_x_vel = Velocity_old_x+self.imu_x_acc*dt
+        self.imu_x_pos += self.imu_x_vel*dt
+
+        Velocity_old_y = self.imu_y_vel
+        self.imu_y_vel = Velocity_old_y+self.imu_y_acc*dt
+        self.imu_y_pos += self.imu_y_vel*dt
+
+    def set_prev_time(self, time):
+        self.prev_time = time
+
+    def get_pos(self):
+        return self.imu_x_pos, self.imu_y_pos
+
+    def get_acc(self):
+        return self.imu_x_acc, self.imu_y_acc
 
 def read_actual_pos(data):
     """
@@ -76,6 +105,7 @@ class WheelEncoder:
         self.wheel_radius = 0.1 # Radius at center of the cone
         self.degree = 270 # Wheel starts with -90 degrees offset
         self.prev_degree = 270  
+        self.prev_tmp_degree = 270  
         self.part_circ = 0
         self.circumfence = 2*math.pi*self.wheel_radius
         #self.prev_part_circ = 0
@@ -104,7 +134,8 @@ class WheelEncoder:
                 + self.circumfence * ((360 - self.prev_degree)/360)
         else:
             dist = 0
-                
+        
+        self.prev_degree = self.degree
         # # if full wheel turn
         # if self.prev_part_circ > self.part_circ:
         #     dist = 2*math.pi*self.wheel_radius \
@@ -134,13 +165,13 @@ class WheelEncoder:
         """
         tmp_degree = (pitch*180)/math.pi
 
-        if tmp_degree >= 0 and tmp_degree <= self.prev_degree:  # 2nd quadrant
+        if tmp_degree >= 0 and tmp_degree <= self.prev_tmp_degree:  # 2nd quadrant
             self.degree = 180 - tmp_degree
-        elif tmp_degree < 0 and tmp_degree <= self.prev_degree: # 3rd quadrant
+        elif tmp_degree < 0 and tmp_degree <= self.prev_tmp_degree: # 3rd quadrant
             self.degree = 180 - tmp_degree
-        elif tmp_degree < 0 and tmp_degree > self.prev_degree:  # 4th quadrant
+        elif tmp_degree < 0 and tmp_degree > self.prev_tmp_degree:  # 4th quadrant
             self.degree = 360 + tmp_degree
-        elif tmp_degree >= 0 and tmp_degree > self.prev_degree: # 1st quadrant
+        elif tmp_degree >= 0 and tmp_degree > self.prev_tmp_degree: # 1st quadrant
             self.degree = tmp_degree
 
-        self.prev_degree = tmp_degree
+        self.prev_tmp_degree = tmp_degree
