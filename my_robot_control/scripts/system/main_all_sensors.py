@@ -144,11 +144,23 @@ if __name__ == "__main__":
     set_wheel_velocity(0)
 
     # MODIFY: Values to plot.
-    plt.plot(recorded_positions["EKF x"], recorded_positions["EKF y"], 'bo', label="EKF pos")
-    plt.plot(recorded_positions["GPS x"], recorded_positions["GPS y"], color="red", label="GPS pos")
-    plt.plot(recorded_positions["Actual x"], recorded_positions["Actual y"], color="black", label="Actual pos")
-    plt.xlabel("x")
-    plt.ylabel("y")
-    plt.title("EKF values")
+
+    plt.subplot(1, 2, 1) # row 1, col 2 index 1
+    plt.plot(range(0,steps+1), recorded_positions["EKF x"], label="EKF pos")
+    plt.plot(range(0,steps+1), recorded_positions["GPS x"], color="red", label="GPS pos")
+    plt.plot(range(0,steps+1), recorded_positions["Actual x"], color="black", label="Actual pos")
+    plt.title("My first plot!")
+    plt.xlabel('steps ')
+    plt.ylabel('Y-Distance ')
     plt.legend()
+
+    plt.subplot(1, 2, 2) # index 2
+    plt.plot(range(0, steps+1), recorded_positions["EKF y"], label="EKF pos")
+    plt.plot(range(0, steps+1), recorded_positions["GPS y"], color="red", label="GPS pos")
+    plt.plot(range(0, steps+1), recorded_positions["Actual y"], color="black", label="Actual pos")
+    plt.title("My second plot!")
+    plt.xlabel('steps ')
+    plt.ylabel('X-Distance ')
+    plt.legend()
+
     plt.show()

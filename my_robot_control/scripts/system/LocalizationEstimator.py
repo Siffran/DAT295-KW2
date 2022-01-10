@@ -117,15 +117,26 @@ class LocalizationEstimator:
         # Measurement Noise Matrix, dim_R = dim_z x dim_z
         self.ekf.R = np.eye(2) * 5   
 
-        # Create measurement noise matrix. It is assembled by 9 3x3 matrices cause `Q_discrete_white_noise` can't handle 9x9.
+        # Create measurement noise matrix.
         # dim_Q = dim_x x dim_x 
-        self.ekf.Q = Q_discrete_white_noise(4, var=.01) 
+        # Search for "Exercise: State Variable Design" at
+        # https://github.com/rlabbe/Kalman-and-Bayesian-Filters-in-Python/blob/master/08-Designing-Kalman-Filters.ipynb
+        q = Q_discrete_white_noise(dim=2, dt=self.dt, var=0.04**2)
+        self.ekf.Q[0,0] = q[0,0]
+        self.ekf.Q[1,1] = q[0,0]
+        self.ekf.Q[2,2] = q[1,1]
+        self.ekf.Q[3,3] = q[1,1]
+        self.ekf.Q[0,2] = q[0,1]
+        self.ekf.Q[2,0] = q[0,1]
+        self.ekf.Q[1,3] = q[0,1]
+        self.ekf.Q[3,1] = q[0,1]
+        #self.ekf.Q = Q_discrete_white_noise(4, var=.01) 
                                     # Engineering Parameter:
                                     # small Q: the filter will be overconfident in its prediction model and will diverge from the actual solution
                                     # large Q: the filter will be unduly influenced by the noise in the measurements and perform sub-optimally
         
         # Posterior Covariance, dim_P = dim_x x dim_x   
-        self.ekf.P = eye(4) * 50        
+        self.ekf.P *= 50        
         
         # HJacobian creates the H matrix for the update step.
         # Explained: https://github.com/rlabbe/Kalman-and-Bayesian-Filters-in-Python/blob/master/11-Extended-Kalman-Filters.ipynb
@@ -135,21 +146,6 @@ class LocalizationEstimator:
         # hx is needed for the measurement correction in the update step. 
         self.hx = lambda x: array([x[0]+x[2]*self.dt, x[1]+x[3]*self.dt]) # dim = dim_z
 
-    # def imu_wheel_HJacobian_at(self, x):
-    #     """ compute Jacobian of H matrix at x for EKF"""
-    #     return array([
-    #                  [1, self.dt, 0.5*self.dt**2, 0, 0, 0, 0, 0, 0],
-    #                  [0, 0, 0, 1, self.dt, 0.5*self.dt**2, 0, 0, 0],
-    #                  [0, 0, 1, 0, 0, 0, 0, 0, 0],
-    #                  [0, 0, 0, 0, 0, 1, 0, 0, 0]
-    #                  ])             
-
-    # def hx(self, x):
-    #     """measurement function"""
-    #     return array([x[0] + x[1]*self.dt + 0.5*x[2]*self.dt**2, x[3] + x[4]*self.dt + 0.5*x[5]*self.dt**2, x[2], x[5]])     # dim = dim_z
-
-        
-        
     def update(self, z):
         """
         Calls update step.
