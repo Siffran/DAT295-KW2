@@ -37,19 +37,20 @@ Profit????
 '''
 
 wheel_encoder = WheelEncoder()
+imu = IMU()
 
 # MODIFY: add variable for your sensor, keep pattern "sensor_direction" i.e. wheel_x
-imu_x_acc = 0.0
-imu_y_acc = 0.0
-wheel_x = 0.0
-wheel_y = 0.0
-actual_x = 0.0
-actual_y = 0.0
 gps_x = 0.0
 gps_y = 0.0
+wheel_x = 0.0
+wheel_y = 0.0
+imu_x_pos = 0.0
+imu_y_pos = 0.0
+actual_x = 0.0
+actual_y = 0.0
 
 #def callback(imu_data, wheel_data, actual_data):
-def callback(gps_data, wheel_data, actual_data):
+def callback(gps_data, wheel_data, imu_data, actual_data):
     """
     Executes the sensor functions to get current values.
     Called by the TimeSynchonizer.
@@ -59,9 +60,10 @@ def callback(gps_data, wheel_data, actual_data):
     # MODIFY: Add get function of each sensor in the configuration.
     
     #global imu_x_acc, imu_y_acc, wheel_x, wheel_y, actual_x, actual_y
-    global gps_x, gps_y, wheel_x, wheel_y, actual_x, actual_y
+    global gps_x, gps_y, wheel_x, wheel_y, actual_x, actual_y, imu_x_pos, imu_y_pos
 
-    #imu_x_acc, imu_y_acc = read_imu_acc(imu_data)
+    imu.update(imu_data,rospy.get_time())
+    imu_x_pos, imu_y_pos = imu.get_pos()
     wheel_encoder.update(wheel_data)
     wheel_x, wheel_y = wheel_encoder.get_pos()
     gps_x, gps_y = read_gps_pos(gps_data)
@@ -92,13 +94,13 @@ if __name__ == "__main__":
     #         Add them to the ApproximateTimeSynchronizer
     #         Adjust time intervall in which two values belong to each other (Third value in ApproximateTimeSynchronizer)
     
-    #imu_sub = message_filters.Subscriber('/imu', Imu)
+    imu_sub = message_filters.Subscriber('/imu', Imu)
     wheel_sub = message_filters.Subscriber('/gazebo/link_states', gazebo_msgs.msg.LinkStates)
     gps_sub = message_filters.Subscriber('/gps', NavSatFix)
     actual_sub = message_filters.Subscriber('/gazebo/model_states', gazebo_msgs.msg.ModelStates)
 
     #ts = message_filters.ApproximateTimeSynchronizer([imu_sub, wheel_sub, actual_sub], 10, 0.02, True)
-    ts = message_filters.ApproximateTimeSynchronizer([gps_sub, wheel_sub, actual_sub], 10, 0.02, True)
+    ts = message_filters.ApproximateTimeSynchronizer([gps_sub, wheel_sub, imu_sub, actual_sub], 10, 0.02, True)
     ts.registerCallback(callback)
 
     # MODIFY: Create instance of Localization estimater.
@@ -117,15 +119,18 @@ if __name__ == "__main__":
         "GPS y":[],
         "Wheel x":[],
         "Wheel y":[],
+        "IMU x":[],
+        "IMU y":[],
         "Actual x":[],
         "Actual y":[]
     }
 
+    imu.set_prev_time(rospy.get_time())
 
     while i <= steps:
 
         # MODIFY: Measurement vector with your sensor values
-        z = np.array([gps_x, gps_y, wheel_x, wheel_y])
+        z = np.array([gps_x, gps_y, wheel_x, wheel_y, imu_x_pos, imu_y_pos])
 
         loc_est.update(z)
         loc_est.predict()
@@ -138,6 +143,8 @@ if __name__ == "__main__":
         recorded_positions["GPS y"].append(gps_y)
         recorded_positions["Wheel x"].append(wheel_x)
         recorded_positions["Wheel y"].append(wheel_y)
+        recorded_positions["IMU x"].append(imu_x_pos)
+        recorded_positions["IMU y"].append(imu_y_pos)
         recorded_positions["Actual x"].append(actual_x)
         recorded_positions["Actual y"].append(actual_y)
 
@@ -153,20 +160,20 @@ if __name__ == "__main__":
     plt.plot(range(0,steps+1), recorded_positions["EKF x"], label="EKF pos")
     plt.plot(range(0,steps+1), recorded_positions["GPS x"], color="red", label="GPS pos")
     plt.plot(range(0,steps+1), recorded_positions["Wheel x"], color="green", label="Wheel pos")
+    plt.plot(range(0,steps+1), recorded_positions["IMU x"], color="orange", label="IMU pos")
     plt.plot(range(0,steps+1), recorded_positions["Actual x"], color="black", label="Actual pos")
-    plt.title("My first plot!")
-    plt.xlabel('steps ')
-    plt.ylabel('Y-Distance ')
+    plt.title("X-Distance")
+    plt.xlabel('steps')
     plt.legend()
 
     plt.subplot(1, 2, 2) # index 2
     plt.plot(range(0, steps+1), recorded_positions["EKF y"], label="EKF pos")
     plt.plot(range(0, steps+1), recorded_positions["GPS y"], color="red", label="GPS pos")
     plt.plot(range(0, steps+1), recorded_positions["Wheel y"], color="green", label="Wheel pos")
+    plt.plot(range(0, steps+1), recorded_positions["IMU y"], color="orange", label="IMU pos")
     plt.plot(range(0, steps+1), recorded_positions["Actual y"], color="black", label="Actual pos")
-    plt.title("My second plot!")
-    plt.xlabel('steps ')
-    plt.ylabel('X-Distance ')
+    plt.title("Y-Distance")
+    plt.xlabel('steps')
     plt.legend()
 
     plt.show()

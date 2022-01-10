@@ -102,13 +102,13 @@ class LocalizationEstimator:
         HINT: Pay attention of the matrix dimensions, they are always noted in a comment !!!
 
         """
-        self.ekf = ExtendedKalmanFilter(dim_x=4,dim_z=2)
+        self.ekf = ExtendedKalmanFilter(dim_x=4,dim_z=6)
         self.dt = 1/self.RATE_Hz
 
         # start values of x = [x_pos, y_pos, x_vel, y_vel]
         self.ekf.x = [0, 0, 0, 0]
         # Measurement vector z = [gps_x, gps_y, wheel_x, wheel_y]
-        self.z = [0, 0, 0, 0]
+        self.z = [0, 0, 0, 0, 0, 0]
         # State Transition Function, F @ x = x_new, dim_F = dim_x x dim_x
         # TODO: add angle theta as shown here: https://github.com/rlabbe/Kalman-and-Bayesian-Filters-in-Python/blob/master/11-Extended-Kalman-Filters.ipynb
         self.ekf.F = eye(4) + array([[0, 0, 1, 0],
@@ -117,7 +117,7 @@ class LocalizationEstimator:
                                      [0, 0, 0, 0]])*self.dt
                                      
         # Measurement Noise Matrix, dim_R = dim_z x dim_z
-        self.ekf.R = np.eye(4) * 5   
+        self.ekf.R = np.eye(6) * 5   
 
         # Create measurement noise matrix.
         # dim_Q = dim_x x dim_x 
@@ -145,10 +145,12 @@ class LocalizationEstimator:
         self.HJacobian_at = lambda x: array([ [1, 0, self.dt, 0],
                                               [0, 1, 0, self.dt],
                                               [1, 0, self.dt, 0],
+                                              [0, 1, 0, self.dt],
+                                              [1, 0, self.dt, 0],
                                               [0, 1, 0, self.dt]])       # dim_HJ = dim_x x dim_z     z = Hx
 
         # hx is needed for the measurement correction in the update step. 
-        self.hx = lambda x: array([x[0]+x[2]*self.dt, x[1]+x[3]*self.dt, x[0]+x[2]*self.dt, x[1]+x[3]*self.dt]) # dim = dim_z
+        self.hx = lambda x: array([x[0]+x[2]*self.dt, x[1]+x[3]*self.dt, x[0]+x[2]*self.dt, x[1]+x[3]*self.dt, x[0]+x[2]*self.dt, x[1]+x[3]*self.dt]) # dim = dim_z
         
     def setup_imupos_wheel_EKF(self):
         """
