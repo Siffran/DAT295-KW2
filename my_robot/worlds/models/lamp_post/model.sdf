@@ -10,6 +10,7 @@
             <scale>3 3 3</scale>
           </mesh>
         </geometry>
+        <laser_retro>200</laser_retro>
       </collision>
       <visual name="visual">
         <geometry>
