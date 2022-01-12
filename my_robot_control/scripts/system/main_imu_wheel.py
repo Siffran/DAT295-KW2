@@ -119,14 +119,41 @@ if __name__ == "__main__":
     set_wheel_velocity(0)
 
     # MODIFY: Values to plot.
-    plt.plot(recorded_positions["EKF x"], recorded_positions["EKF y"], label="EKF pos")
-    plt.plot(recorded_positions["Wheel x"], recorded_positions["Wheel y"], label="Wheel pos")
-    plt.plot(recorded_positions["IMU x"], recorded_positions["IMU y"], label="IMU pos")
-    plt.plot(recorded_positions["Actual x"], recorded_positions["Actual y"], label="Actual pos")
+    plt.plot(recorded_positions["EKF x"], recorded_positions["EKF y"], label="EKF pos", color="red")
+    plt.plot(recorded_positions["Wheel x"], recorded_positions["Wheel y"], label="Wheel pos", color="blue")
+    plt.plot(recorded_positions["IMU x"], recorded_positions["IMU y"], label="IMU pos", color="green")
+    plt.plot(recorded_positions["Actual x"], recorded_positions["Actual y"], label="Actual pos", color="cyan")
     plt.xlabel("x")
     plt.ylabel("y")
     plt.title("EKF values")
     plt.legend()
+    # plt.show()
+
+    # the error between the estimated position 
+    fig2 = plt.figure()
+    plt.subplot(1, 2, 1) # row 1, col 2 index 1
+    c1 = [recorded_positions["EKF y"][i] - recorded_positions["Actual y"][i] for i in range(len(recorded_positions["EKF y"]))]
+    c2 = [recorded_positions["IMU y"][i] - recorded_positions["Actual y"][i] for i in range(len(recorded_positions["IMU y"]))]
+    c3 = [recorded_positions["Wheel y"][i] - recorded_positions["Actual y"][i] for i in range(len(recorded_positions["Wheel y"]))]
+    plt.plot(range(0,steps+1), c1, label="Error for EKF", color="red")
+    plt.plot(range(0,steps+1), c2, label="Error for IMU", color="green")
+    plt.plot(range(0,steps+1), c3, label="Error for Wheel", color="blue")
+    plt.title("the error for y")
+    plt.xlabel('steps ')
+    plt.ylabel('Y-Distance ')
+    plt.legend()
+
+    plt.subplot(1, 2, 2) # index 2
+    cc1 = [recorded_positions["EKF x"][i] - recorded_positions["Actual x"][i] for i in range(len(recorded_positions["EKF x"]))]
+    cc2 = [recorded_positions["IMU x"][i] - recorded_positions["Actual x"][i] for i in range(len(recorded_positions["IMU x"]))]
+    cc3 = [recorded_positions["Wheel x"][i] - recorded_positions["Actual x"][i] for i in range(len(recorded_positions["Wheel x"]))]
+    plt.plot(range(0,steps+1), cc1, label="Error for EKF", color="red")
+    plt.plot(range(0,steps+1), cc2, label="Error for IMU", color="green")
+    plt.plot(range(0,steps+1), cc3, label="Error for Wheel", color="blue")
+    plt.title("the error for x")
+    plt.xlabel('steps ')
+    plt.ylabel('X-Distance ')
+
     plt.show()
         
     
