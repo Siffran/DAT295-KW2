@@ -74,7 +74,7 @@ if __name__ == "__main__":
     loc_est = LocalizationEstimator("gpspos+wheel", RATE_Hz)
 
     # MODIFY: Amount of steps the while loop records values.
-    steps = 200
+    steps = 250
     i = 0
 
     # MODIFY: Values to record
@@ -102,7 +102,7 @@ if __name__ == "__main__":
 
         # MODIFY: Append values to record.
         recorded_positions["EKF x"].append(state_vector[0])
-        recorded_positions["EKF y"].append(state_vector[3])
+        recorded_positions["EKF y"].append(state_vector[1])
         recorded_positions["Wheel x"].append(wheel_x)
         recorded_positions["Wheel y"].append(wheel_y)
         recorded_positions["GPS x"].append(gps_x)
@@ -125,7 +125,7 @@ if __name__ == "__main__":
     plt.ylabel("y")
     plt.title("EKF values")
     plt.legend()
-    plt.show()
+    #plt.show()
 
     # the error between the estimated position 
     fig2 = plt.figure()
