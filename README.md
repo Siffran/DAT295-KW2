@@ -8,7 +8,6 @@
 ## Required Packages
 - sudo apt install python3-pip
 - pip install haversine
-- pip install filterpy
 - sudo apt-get install ros-noetic-hector-gazebo-plugins
 
 ## Copy folders to your catkin_ws/src/
@@ -32,22 +31,23 @@ Make sure that everything is compiled by catkin_make.
 
 chmod +x start.sh 
 ./start.sh
+(maybe adjust your terminal e.g. from "genome-terminal" to "mate-terminal")
 
 ### * Manually
 
 ### roscore
 - source your ROS
 - start roscore
+
 ### start Gazebo
 - in catkin_ws folder
 - source devel/setup.bash
-- roslaunch my_robot joints.launch
+- roslaunch my_robot my_robot.launch
+  
 ### start Controller
+- in catkin_ws folder
+- source devel/setup.bash
 - roslaunch my_robot_control my_robot_control.launch
-- rosrun rqt_gui rqt_gui
-  - select topic: /my_robot/my_robot_x_postition_controller/command
 
 ## Move
-- in rqt-gui
-- change expression on right side
-- click checkbox on left side
+- execute one of the main files in my_robot_control/scripts/system

@@ -74,47 +74,6 @@
   </include>
 </model>
 
- <!--five lamps parallel to the rail track-->
-<model name="lamp1">
-    <include>
-      <uri>model://lamp_post</uri>
-      <pose>-5 0 0 0 0 1.57</pose>
-      <static>true</static>
-  </include>
-</model>
-
-<model name="lamp2">
-    <include>
-      <uri>model://lamp_post</uri>
-      <pose>-4.5 60 0 0 0 1.57</pose>
-      <static>true</static>
-  </include>
-</model>
-
-<model name="lamp3">
-    <include>
-      <uri>model://lamp_post</uri>
-      <pose>11 120 0 0 0 1.57</pose>
-      <static>true</static>
-  </include>
-</model>
-
-<model name="lamp4">
-    <include>
-      <uri>model://lamp_post</uri>
-      <pose>-2.5 180 0 0 0 1.57</pose>
-      <static>true</static>
-  </include>
-</model>
-
-<model name="lamp5">
-    <include>
-      <uri>model://lamp_post</uri>
-      <pose>-2.5 240 0 0 0 1.57</pose>
-      <static>true</static>
-  </include>
-</model>
-
     <population name="tree_population_left">
       <model name="oak_tree_left">
         <include>
@@ -133,43 +92,24 @@
       </distribution>
     </population>
     
-     <population name="tree_population_near1">
-      <model name="oak_tree_near1">
+     <population name="tree_population_near">
+      <model name="oak_tree_near">
         <include>
           <static>true</static>
           <uri>model://oak_tree</uri>
           <pose>0 0 0 0 0 0</pose>
         </include>
       </model>
-      <pose>-6 30 0 0 0 0</pose>
+      <pose>-7 300 0 0 0 0</pose>
       <box>
-        <size>4 50 0.01</size>
+        <size>4 600 0.01</size>
       </box>
-      <model_count>10</model_count>
+      <model_count>40</model_count>
       <distribution>
         <type>random</type>
       </distribution>
     </population>
-   
-    <population name="tree_population_near2">
-      <model name="oak_tree_near2">
-        <include>
-          <static>true</static>
-          <uri>model://oak_tree</uri>
-          <pose>0 0 0 0 0 0</pose>
-        </include>
-      </model>
-      <pose>-6 120 0 0 0 0</pose>
-      <box>
-        <size>4 110 0.01</size>
-      </box>
-      <model_count>30</model_count>
-      <distribution>
-        <type>random</type>
-      </distribution>
-    </population>
-   
-
+    
     <population name="tree_population_right">
       <model name="oak_tree_right">
         <include>
@@ -188,7 +128,7 @@
       </distribution>
     </population>
     <!-- automatic population of objects -->
-    <!--<population name="lamp_post_population">
+    <population name="lamp_post_population">
       <model name="lamp_post">
         <include>
           <static>true</static>
@@ -204,7 +144,7 @@
       <distribution>
         <type>linear-y</type>
       </distribution>
-    </population>-->
+    </population>
 
   </world>
 </sdf>

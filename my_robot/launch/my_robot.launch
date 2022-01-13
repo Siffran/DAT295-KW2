@@ -1,7 +1,17 @@
-<?xml version="1.0"?>
 <launch>
 
+<!-- Launch Gazebo Environment and Robot -->
+<!-- MODIFY Robot & World: -->
   <!-- these are the arguments you can pass this launch file, for example paused:=true -->
+  <arg name="model" default="$(find my_robot)/urdf/my_robot.urdf.xacro"/>
+
+  <!-- Note: the world_name is with respect to GAZEBO_RESOURCE_PATH environmental variable -->
+  <!-- Uncomment World you need: -->
+  <arg name="world_name" default="$(find my_robot)/worlds/v1_simple_world.world"/> 
+  <!-- <arg name="world_name" default="$(find my_robot)/worlds/v2_curved_world.world"/>  -->
+  <!-- <arg name="world_name" default="$(find my_robot)/worlds/v3_tunnel_world.world"/>  -->
+
+<!-- World Settings -->
   <arg name="paused" default="false"/>
   <arg name="use_sim_time" default="true"/>
   <arg name="extra_gazebo_args" default=""/>
@@ -15,7 +25,6 @@
   <arg name="physics" default="ode"/>
   <arg name="verbose" default="false"/>
   <arg name="output" default="screen"/>
-  <arg name="world_name" default="$(find my_robot)/worlds/test_world.world"/> <!-- Note: the world_name is with respect to GAZEBO_RESOURCE_PATH environmental variable -->
   <arg name="respawn_gazebo" default="false"/>
   <arg name="use_clock_frequency" default="false"/>
   <arg name="pub_clock_frequency" default="100"/>
@@ -36,7 +45,7 @@
   <arg unless="$(arg debug)" name="script_type" value="gzserver"/>
   <arg     if="$(arg debug)" name="script_type" value="debug"/>
 
-  <!-- start gazebo server-->
+<!-- start gazebo server-->
   <group if="$(arg use_clock_frequency)">
     <param name="gazebo/pub_clock_frequency" value="$(arg pub_clock_frequency)" />
   </group>
@@ -47,10 +56,22 @@
 	args="$(arg command_arg1) $(arg command_arg2) $(arg command_arg3) -e $(arg physics) $(arg extra_gazebo_args) $(arg world_name)"
   required="$(arg server_required)" />
 
-  <!-- start gazebo client -->
+<!-- start gazebo client -->
   <group if="$(arg gui)">
     <node name="gazebo_gui" pkg="gazebo_ros" type="gzclient" respawn="false" output="$(arg output)" args="$(arg command_arg3)"
     required="$(arg gui_required)"/>
   </group>
+
+<!-- Spawn Robot -->
+  <param name="robot_description" command="$(find xacro)/xacro $(arg model)" />
+
+  <!-- push robot_description to factory and spawn robot in gazebo -->
+  <node name="urdf_spawner" pkg="gazebo_ros" type="spawn_model"
+        args="-z 1.0 -unpause -urdf -model robot -param robot_description" respawn="false" output="screen" />
+
+<!-- Create Publisher -->
+  <node pkg="robot_state_publisher" type="robot_state_publisher"  name="robot_state_publisher">
+    <param name="publish_frequency" type="double" value="30.0" />
+  </node>
 
 </launch>
