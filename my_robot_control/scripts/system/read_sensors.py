@@ -243,12 +243,20 @@ def read_gps_pos(data):
 	Return:
 	int pos_x_gps, pos_y_gps
 	"""
-	origin = (0, 0)
-	current_location_x = (data.latitude, 0)
+
+	origin = (57.70887, 11.97456)	#coordinates of GBG
+	current_location_x = (data.latitude, 11.97456)
 	pos_x_gps = hs.haversine(origin, current_location_x, unit=Unit.METERS)
 
-	current_location_y = (0, data.longitude)
+	current_location_y = (57.70887, data.longitude)
 	pos_y_gps = hs.haversine(origin, current_location_y, unit=Unit.METERS)
+
+	if data.latitude < 57.70887:
+		pos_x_gps = -pos_x_gps
+	
+	if data.longitude > 11.97456:
+		pos_y_gps = -pos_y_gps
+
 
 	return pos_x_gps, pos_y_gps
 

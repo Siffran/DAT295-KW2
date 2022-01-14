@@ -1,7 +1,7 @@
 # other software parts
 from control_robot import set_wheel_velocity
 from LocalizationEstimator import LocalizationEstimator
-from read_sensors import read_actual_pos, read_gps_pos, WheelEncoder, IMU
+from read_sensors import read_actual_pos, read_gps_pos, WheelEncoder, IMU, Laser
 
 # rospy related
 import rospy
@@ -38,6 +38,7 @@ Profit????
 
 wheel_encoder = WheelEncoder()
 imu = IMU()
+laser = Laser()
 
 # MODIFY: add variable for your sensor, keep pattern "sensor_direction" i.e. wheel_x
 gps_x = 0.0
@@ -46,11 +47,13 @@ wheel_x = 0.0
 wheel_y = 0.0
 imu_x_pos = 0.0
 imu_y_pos = 0.0
+laser_x_pos = 0.0
+laser_y_pos = 0.0
 actual_x = 0.0
 actual_y = 0.0
 
 #def callback(imu_data, wheel_data, actual_data):
-def callback(gps_data, wheel_data, imu_data, actual_data):
+def callback(gps_data, wheel_data, imu_data, laser_data):
     """
     Executes the sensor functions to get current values.
     Called by the TimeSynchonizer.
@@ -60,14 +63,15 @@ def callback(gps_data, wheel_data, imu_data, actual_data):
     # MODIFY: Add get function of each sensor in the configuration.
     
     #global imu_x_acc, imu_y_acc, wheel_x, wheel_y, actual_x, actual_y
-    global gps_x, gps_y, wheel_x, wheel_y, actual_x, actual_y, imu_x_pos, imu_y_pos
+    global gps_x, gps_y, wheel_x, wheel_y, actual_x, actual_y, imu_x_pos, imu_y_pos, laser_x_pos, laser_y_pos
 
     imu.update(imu_data,rospy.get_time())
     imu_x_pos, imu_y_pos = imu.get_pos()
     wheel_encoder.update(wheel_data)
     wheel_x, wheel_y = wheel_encoder.get_pos()
     gps_x, gps_y = read_gps_pos(gps_data)
-    actual_x, actual_y = read_actual_pos(actual_data)
+    laser.update(laser_data)
+    laser_x_pos, laser_y_pos = laser.get_pos()
     
 if __name__ == "__main__":
     """
@@ -97,15 +101,16 @@ if __name__ == "__main__":
     imu_sub = message_filters.Subscriber('/imu', Imu)
     wheel_sub = message_filters.Subscriber('/gazebo/link_states', gazebo_msgs.msg.LinkStates)
     gps_sub = message_filters.Subscriber('/gps', NavSatFix)
-    actual_sub = message_filters.Subscriber('/gazebo/model_states', gazebo_msgs.msg.ModelStates)
+    laser_sub = message_filters.Subscriber('/rrbot/laser/scan', LaserScan)
+    #actual_sub = message_filters.Subscriber('/gazebo/model_states', gazebo_msgs.msg.ModelStates)
 
     #ts = message_filters.ApproximateTimeSynchronizer([imu_sub, wheel_sub, actual_sub], 10, 0.02, True)
-    ts = message_filters.ApproximateTimeSynchronizer([gps_sub, wheel_sub, imu_sub, actual_sub], 10, 0.02, True)
+    ts = message_filters.ApproximateTimeSynchronizer([gps_sub, wheel_sub, imu_sub, laser_sub], 10, 0.02, True)
     ts.registerCallback(callback)
 
     # MODIFY: Create instance of Localization estimater.
     #         The setup function has to be created in the LocalizationEstimator.py file
-    loc_est = LocalizationEstimator("all", RATE_Hz)
+    loc_est = LocalizationEstimator("imu+wheel+gps+laser", RATE_Hz)
 
     # MODIFY: Amount of steps the while loop records values.
     steps = 500
@@ -121,8 +126,10 @@ if __name__ == "__main__":
         "Wheel y":[],
         "IMU x":[],
         "IMU y":[],
-        "Actual x":[],
-        "Actual y":[]
+        "Laser x":[],
+        "Laser y":[],
+        "Actual x service":[],
+        "Actual y service":[]
     }
 
     imu.set_prev_time(rospy.get_time())
@@ -130,11 +137,14 @@ if __name__ == "__main__":
     while i <= steps:
 
         # MODIFY: Measurement vector with your sensor values
-        z = np.array([gps_x, gps_y, wheel_x, wheel_y, imu_x_pos, imu_y_pos])
+        z = np.array([gps_x, gps_y, wheel_x, wheel_y, imu_x_pos, imu_y_pos, laser_x_pos, laser_y_pos])
 
         loc_est.update(z)
         loc_est.predict()
         state_vector = loc_est.get_state_vector()
+
+        model_state = rospy.ServiceProxy('/gazebo/get_model_state', GetModelState)
+        robot_coordinates = model_state('robot', '')
 
         # MODIFY: Append values to record.
         recorded_positions["EKF x"].append(state_vector[0])
@@ -145,8 +155,10 @@ if __name__ == "__main__":
         recorded_positions["Wheel y"].append(wheel_y)
         recorded_positions["IMU x"].append(imu_x_pos)
         recorded_positions["IMU y"].append(imu_y_pos)
-        recorded_positions["Actual x"].append(actual_x)
-        recorded_positions["Actual y"].append(actual_y)
+        recorded_positions["Laser x"].append(laser_x_pos)
+        recorded_positions["Laser y"].append(laser_y_pos)
+        recorded_positions["Actual x service"].append(robot_coordinates.pose.position.x)
+        recorded_positions["Actual y service"].append(robot_coordinates.pose.position.y)
 
         rate.sleep()
         i += 1
@@ -161,7 +173,8 @@ if __name__ == "__main__":
     plt.plot(range(0,steps+1), recorded_positions["GPS x"], color="red", label="GPS pos")
     plt.plot(range(0,steps+1), recorded_positions["Wheel x"], color="green", label="Wheel pos")
     plt.plot(range(0,steps+1), recorded_positions["IMU x"], color="orange", label="IMU pos")
-    plt.plot(range(0,steps+1), recorded_positions["Actual x"], color="black", label="Actual pos")
+    plt.plot(range(0,steps+1), recorded_positions["Laser x"], color="purple", label="Laser pos")
+    plt.plot(range(0,steps+1), recorded_positions["Actual x service"], color="grey", label="Actual pos service")
     plt.title("X-Distance")
     plt.xlabel('steps')
     plt.legend()
@@ -171,7 +184,8 @@ if __name__ == "__main__":
     plt.plot(range(0, steps+1), recorded_positions["GPS y"], color="red", label="GPS pos")
     plt.plot(range(0, steps+1), recorded_positions["Wheel y"], color="green", label="Wheel pos")
     plt.plot(range(0, steps+1), recorded_positions["IMU y"], color="orange", label="IMU pos")
-    plt.plot(range(0, steps+1), recorded_positions["Actual y"], color="black", label="Actual pos")
+    plt.plot(range(0,steps+1), recorded_positions["Laser y"], color="purple", label="Laser pos")
+    plt.plot(range(0,steps+1), recorded_positions["Actual y service"], color="grey", label="Actual pos service")
     plt.title("Y-Distance")
     plt.xlabel('steps')
     plt.legend()

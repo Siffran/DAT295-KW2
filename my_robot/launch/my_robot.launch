@@ -7,8 +7,8 @@
 
   <!-- Note: the world_name is with respect to GAZEBO_RESOURCE_PATH environmental variable -->
   <!-- Uncomment World you need: -->
-  <arg name="world_name" default="$(find my_robot)/worlds/v1_simple_world.world"/> 
-  <!-- <arg name="world_name" default="$(find my_robot)/worlds/v2_curved_world.world"/>  -->
+  <arg name="world_name" default="$(find my_robot)/worlds/v1_simple_world.world"/>
+  <!--<arg name="world_name" default="$(find my_robot)/worlds/v2_curved_world.world"/>  -->
   <!-- <arg name="world_name" default="$(find my_robot)/worlds/v3_tunnel_world.world"/>  -->
 
 <!-- World Settings -->

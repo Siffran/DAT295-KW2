@@ -15,7 +15,16 @@ from haversine import Unit
 import numpy as np
 from matplotlib import pyplot as plt
 
-def callback(gps_data, actual_data):
+gps_x = 0.0
+gps_y = 0.0
+wheel_x = 0.0
+wheel_y = 0.0
+imu_x_pos = 0.0
+imu_y_pos = 0.0
+actual_x = 0.0
+actual_y = 0.0
+
+def callback(gps_data):
 
     '''
     # Get gazebo (real) position
@@ -34,11 +43,9 @@ def callback(gps_data, actual_data):
     print("Actual Position Y: ", robot_coordinates.pose.position.y)
     print()
     '''
-
     global gps_x, gps_y, actual_x, actual_y
-
     gps_x, gps_y = read_gps_pos(gps_data)
-    actual_x, actual_y = read_actual_pos(actual_data)
+    #actual_x, actual_y = read_actual_pos(actual_data)
 
 
 
@@ -67,9 +74,10 @@ if __name__ == '__main__':
     '''
 
     gps_sub = message_filters.Subscriber('/gps', NavSatFix)
-    actual_sub = message_filters.Subscriber('/gazebo/model_states', gazebo_msgs.msg.ModelStates)
+    #actual_sub = message_filters.Subscriber('/gazebo/model_states', gazebo_msgs.msg.ModelStates)
 
-    ts = message_filters.ApproximateTimeSynchronizer([gps_sub, actual_sub], 10, 0.02, True)
+    #ts = message_filters.ApproximateTimeSynchronizer([gps_sub, actual_sub], 10, 0.02, True)
+    ts = message_filters.ApproximateTimeSynchronizer([gps_sub], 10, 0.02, True)
     ts.registerCallback(callback)
 
     # Get initial position (use this as offset later?)
@@ -90,8 +98,8 @@ if __name__ == '__main__':
     recorded_positions = {
         "GPS x":[],
         "GPS y":[],
-        "Actual x":[],
-        "Actual y":[],
+        #"Actual x":[],
+        #"Actual y":[],
         "Actual x service":[],
         "Actual y service":[]
     }
@@ -104,8 +112,8 @@ if __name__ == '__main__':
         # MODIFY: Append values to record.
         recorded_positions["GPS x"].append(gps_x)
         recorded_positions["GPS y"].append(gps_y)
-        recorded_positions["Actual x"].append(actual_x)
-        recorded_positions["Actual y"].append(actual_y)
+        #recorded_positions["Actual x"].append(actual_x)
+        #recorded_positions["Actual y"].append(actual_y)
         recorded_positions["Actual x service"].append(robot_coordinates.pose.position.x)
         recorded_positions["Actual y service"].append(robot_coordinates.pose.position.y)
 
@@ -117,7 +125,7 @@ if __name__ == '__main__':
     # MODIFY: Values to plot.
     plt.subplot(1, 2, 1) # row 1, col 2 index 1
     plt.plot(range(0,steps+1), recorded_positions["GPS x"], color="red", label="GPS pos")
-    plt.plot(range(0,steps+1), recorded_positions["Actual x"], color="black", label="Actual pos")
+    #plt.plot(range(0,steps+1), recorded_positions["Actual x"], color="black", label="Actual pos")
     plt.plot(range(0,steps+1), recorded_positions["Actual x service"], color="orange", label="Actual pos service")
     plt.title("X-Distance")
     plt.xlabel('steps')
@@ -125,7 +133,7 @@ if __name__ == '__main__':
 
     plt.subplot(1, 2, 2) # index 2
     plt.plot(range(0, steps+1), recorded_positions["GPS y"], color="red", label="GPS pos")
-    plt.plot(range(0, steps+1), recorded_positions["Actual y"], color="black", label="Actual pos")
+    #plt.plot(range(0, steps+1), recorded_positions["Actual y"], color="black", label="Actual pos")
     plt.plot(range(0,steps+1), recorded_positions["Actual y service"], color="orange", label="Actual pos service")
     plt.title("Y-Distance")
     plt.xlabel('steps')
