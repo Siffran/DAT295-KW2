@@ -11,6 +11,7 @@ find_package(catkin REQUIRED COMPONENTS
   controller_manager
   joint_state_controller
   robot_state_publisher
+  effort_controllers
 )
 
 ## System dependencies are found with CMake's conventions
@@ -160,7 +161,10 @@ include_directories(
 ## Mark executable scripts (Python etc.) for installation
 ## in contrast to setup.py, you can choose the destination
 catkin_install_python(PROGRAMS
-   scripts/experiments/control.py
+   scripts/system/control_robot.py
+   scripts/system/LocalizationEstimator.py
+   scripts/system/main_imu_wheel.py
+   scripts/system/read_sensors.py
    DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
  )
 

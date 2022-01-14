@@ -24,66 +24,23 @@
                izz="1.0" />
     </inertial>
   </xacro:macro>
-<!--
-  <link name="my_robot_xpart">
+
+
+  <link name="base_footprint">
     <visual>
-      <origin rpy="0 0 0" xyz="0 0 ${height/2}"/>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
       <geometry>
-        <box size="${length} ${width} ${height/2}"/>
+        <box size="0 0 0"/>
       </geometry>
     </visual>
     <collision>
-      <origin rpy="0 0 0" xyz="0 0 ${height/2}"/>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
       <geometry>
-        <box size="${length} ${width} ${height/2}"/>
+        <box size="0 0 0"/>
       </geometry>
     </collision>
-    <xacro:default_inertial mass="10"/>
+    <xacro:default_inertial mass="0.1"/>
   </link>
-
-  <gazebo reference="my_robot_xpart">
-    <mu1>10.0</mu1>
-    <mu2>10.0</mu2>
-    <material> Gazebo/GreyTransparent</material>
-  </gazebo>
-
-  <joint name="my_robot_x" type="prismatic">
-    <origin rpy="0 0 0" xyz="0 0 0"/>
-    <parent link="world"/>
-    <child link="my_robot_xpart"/>
-    <axis xyz="1 0 0"/>
-    <dynamics damping="0" friction="0"/>
-    <limit effort="10000" lower="-50.0" upper="50.0" velocity="1"/>
-  </joint>
-
-  <transmission name="tran1">
-    <type>transmission_interface/SimpleTransmission</type>
-    <joint name="my_robot_x">
-      <hardwareInterface>EffortJointInterface</hardwareInterface>
-    </joint>
-    <actuator name="motor1">
-      <hardwareInterface>EffortJointInterface</hardwareInterface>
-      <mechanicalReduction>1</mechanicalReduction>
-    </actuator>
-  </transmission>
--->
-
-<link name="base_footprint">
-  <visual>
-    <origin rpy="0 0 0" xyz="0 0 0"/>
-    <geometry>
-      <box size="0 0 0"/>
-    </geometry>
-  </visual>
-  <collision>
-    <origin rpy="0 0 0" xyz="0 0 0"/>
-    <geometry>
-      <box size="0 0 0"/>
-    </geometry>
-  </collision>
-  <xacro:default_inertial mass="0.1"/>
-</link>
-
 
   <link name="base_link">
     <visual>
@@ -103,12 +60,12 @@
 
   <link name="wheel_1">
     <visual>
-        <geometry>
-          <mesh filename="package://my_robot/urdf/${cone_name}" scale="${cone_scale}"/>
-        </geometry>
+      <geometry>
+        <mesh filename="package://my_robot/urdf/${cone_name}" scale="${cone_scale}"/>
+      </geometry>
       <origin rpy="0 0 0" xyz="0 0 0"/>
     </visual>
-  
+
     <collision>
       <geometry>
         <mesh filename="package://my_robot/urdf/${cone_name}" scale="${cone_scale}"/>
@@ -117,131 +74,119 @@
     </collision>
 
     <xacro:default_inertial mass="3"/>
-</link>
-
-
+  </link>
 
   <link name="wheel_2">
     <visual>
       <geometry>
         <mesh filename="package://my_robot/urdf/${cone_name}" scale="${cone_scale}"/>
       </geometry>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+    </visual>
+
+    <collision>
+      <geometry>
+        <mesh filename="package://my_robot/urdf/${cone_name}" scale="${cone_scale}"/>
+      </geometry>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+    </collision>
+
+    <xacro:default_inertial mass="3"/>
+  </link>
+
+
+  <link name="wheel_3">
+    <visual>
+      <geometry>
+        <mesh filename="package://my_robot/urdf/${cone_name}" scale="${cone_scale}"/>
+      </geometry>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+    </visual>
+
+    <collision>
+      <geometry>
+        <mesh filename="package://my_robot/urdf/${cone_name}" scale="${cone_scale}"/>
+      </geometry>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+    </collision>
+
+    <xacro:default_inertial mass="3"/>
+  </link>
+
+  <link name="wheel_4">
+    <visual>
+      <geometry>
+        <mesh filename="package://my_robot/urdf/${cone_name}" scale="${cone_scale}"/>
+      </geometry>
     <origin rpy="0 0 0" xyz="0 0 0"/>
-  </visual>
+    </visual>
 
-  <collision>
-    <geometry>
-      <mesh filename="package://my_robot/urdf/${cone_name}" scale="${cone_scale}"/>
-    </geometry>
-    <origin rpy="0 0 0" xyz="0 0 0"/>
-  </collision>
+    <collision>
+      <geometry>
+        <mesh filename="package://my_robot/urdf/${cone_name}" scale="${cone_scale}"/>
+      </geometry>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+    </collision>
 
-  <xacro:default_inertial mass="3"/>
-</link>
+    <xacro:default_inertial mass="3"/>
+  </link>
 
+  <link name="imu_link">
+    <visual>
+      <geometry>
+        <box size="0.1 0.1 0.1"/>
+      </geometry>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+      <material name="black">
+        <color rgba="0 0 0 1"/>
+      </material>
+    </visual>
 
-<link name="wheel_3">
-  <visual>
-    <geometry>
-      <mesh filename="package://my_robot/urdf/${cone_name}" scale="${cone_scale}"/>
-    </geometry>
-  <origin rpy="0 0 0" xyz="0 0 0"/>
-</visual>
+    <collision>
+      <geometry>
+        <box size="0.1 0.1 0.1"/>
+      </geometry>
+    </collision>
 
-<collision>
-  <geometry>
-    <mesh filename="package://my_robot/urdf/${cone_name}" scale="${cone_scale}"/>
-  </geometry>
-  <origin rpy="0 0 0" xyz="0 0 0"/>
-</collision>
+    <xacro:default_inertial mass="0.1"/>
+  </link>
 
-<xacro:default_inertial mass="3"/>
-</link>
+  <link name="gps_link">
+    <visual>
+      <geometry>
+        <box size="0.1 0.1 0.1"/>
+      </geometry>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+      <material name="black">
+        <color rgba="0 0 0 1"/>
+      </material>
+    </visual>
 
+    <collision>
+      <geometry>
+        <box size="0.1 0.1 0.1"/>
+      </geometry>
+    </collision>
 
-<link name="wheel_4">
-  <visual>
-    <geometry>
-      <mesh filename="package://my_robot/urdf/${cone_name}" scale="${cone_scale}"/>
-    </geometry>
-  <origin rpy="0 0 0" xyz="0 0 0"/>
-</visual>
+    <xacro:default_inertial mass="0.1"/>
+  </link>
 
-<collision>
-  <geometry>
-    <mesh filename="package://my_robot/urdf/${cone_name}" scale="${cone_scale}"/>
-  </geometry>
-  <origin rpy="0 0 0" xyz="0 0 0"/>
-</collision>
+  <link name="laserscan_link">
+    <visual>
+      <geometry>
+        <box size="0.05 0.05 0.4"/>
+      </geometry>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+    </visual>
 
-<xacro:default_inertial mass="3"/>
-</link>
-<link name="imu_link">
-  <visual>
-    <geometry>
-      <box size="0.1 0.1 0.1"/>
-    </geometry>
-    <origin rpy="0 0 0" xyz="0 0 0"/>
-    <material name="black">
-          <color rgba="0 0 0 1"/>
-    </material>
-  </visual>
-  <collision>
-    <geometry>
-      <box size="0.1 0.1 0.1"/>
-    </geometry>
-  </collision>
-  <xacro:default_inertial mass="0.1"/>
-</link>
+    <collision>
+      <geometry>
+        <box size="0.05 0.05 0.4"/>
+      </geometry>
+    </collision>
 
-<link name="gps_link">
-  <visual>
-    <geometry>
-      <box size="0.1 0.1 0.1"/>
-    </geometry>
-    <origin rpy="0 0 0" xyz="0 0 0"/>
-    <material name="black">
-          <color rgba="0 0 0 1"/>
-    </material>
-  </visual>
-  <collision>
-    <geometry>
-      <box size="0.1 0.1 0.1"/>
-    </geometry>
-  </collision>
-  <xacro:default_inertial mass="0.1"/>
-</link>
-
-<link name="laserscan_link">
-  <visual>
-    <geometry>
-      <box size="0.05 0.05 0.4"/>
-    </geometry>
-    <origin rpy="0 0 0" xyz="0 0 0"/>
-  </visual>
-  <collision>
-    <geometry>
-      <box size="0.05 0.05 0.4"/>
-    </geometry>
-  </collision>
-  <xacro:default_inertial mass="0.1"/>
-</link>
-
-<link name="camera_link">
-  <visual>
-    <geometry>
-      <box size="0.1 0.1 0.1"/>
-    </geometry>
-    <origin rpy="0 0 0" xyz="0 0 0"/>
-  </visual>
-  <collision>
-    <geometry>
-      <box size="0.1 0.1 0.1"/>
-    </geometry>
-  </collision>
-  <xacro:default_inertial mass="0.1"/>
-</link>
-
+    <xacro:default_inertial mass="0.1"/>
+  </link>
 
   <joint name="my_robot_base" type="prismatic">
     <origin rpy="0 0 0" xyz="0 0 0"/>
@@ -301,93 +246,70 @@
     <axis xyz="0 0 1" />
   </joint>
 
-  <joint name="base_to_camera" type="fixed">
-    <parent link="base_link"/>
-    <child link="camera_link"/>
-    <origin rpy="0.0 0.0 ${pi/2}" xyz="0.2 0.2 0.175"/>
-    <axis xyz="0 0 1" />
-  </joint>
-
-
-  <transmission name="tran2">
+  <transmission name="transmission_wheel_1">
     <type>transmission_interface/SimpleTransmission</type>
-    <joint name="my_robot_base">
-      <hardwareInterface>EffortJointInterface</hardwareInterface>
+    <joint name="base_to_wheel1">
+      <hardwareInterface>hardware_interface/EffortJointInterface</hardwareInterface>
     </joint>
-    <actuator name="motor2">
-      <hardwareInterface>EffortJointInterface</hardwareInterface>
+    <actuator name="motor_wheel_1">
+      <hardwareInterface>hardware_interface/EffortJointInterface</hardwareInterface>
       <mechanicalReduction>1</mechanicalReduction>
     </actuator>
   </transmission>
 
-  <transmission name="transmission_wheel_1">
+  <transmission name="transmission_wheel_2">
     <type>transmission_interface/SimpleTransmission</type>
-    <joint name="base_to_wheel1">
-        <hardwareInterface>hardware_interface/EffortJointInterface</hardwareInterface>
-    </joint>
-    <actuator name="motor_wheel_1">
-        <hardwareInterface>hardware_interface/EffortJointInterface</hardwareInterface>
-        <mechanicalReduction>1</mechanicalReduction>
-    </actuator>
-</transmission>
-
-<transmission name="transmission_wheel_2">
-  <type>transmission_interface/SimpleTransmission</type>
-  <joint name="base_to_wheel2">
+    <joint name="base_to_wheel2">
       <hardwareInterface>hardware_interface/EffortJointInterface</hardwareInterface>
-  </joint>
-  <actuator name="motor_wheel_2">
+    </joint>
+    <actuator name="motor_wheel_2">
       <hardwareInterface>hardware_interface/EffortJointInterface</hardwareInterface>
       <mechanicalReduction>1</mechanicalReduction>
-  </actuator>
-</transmission>
+    </actuator>
+  </transmission>
 
-<!--
-  <joint name="entity" type="fixed">
-    <origin rpy="0 0 0" xyz="0 0 0"/>
-    <parent link="my_robot_xpart"/>
-    <child link="my_robot_ypart"/>
-  </joint>-->
-<gazebo reference="base_link">
+  <gazebo reference="base_link">
     <material>Gazebo/Blue</material>
     <gravity>1</gravity>
-</gazebo>
+  </gazebo>
 
-<gazebo reference="wheel_1">
-  <mu1 value="200.0"/>
-  <mu2 value="100.0"/>
-  <kp value="10000000.0" />
-  <kd value="1.0" />
-  <material>Gazebo/Yellow</material>
-</gazebo>
+  <gazebo reference="wheel_1">
+    <mu1 value="200.0"/>
+    <mu2 value="100.0"/>
+    <kp value="10000000.0" />
+    <kd value="1.0" />
+    <material>Gazebo/Yellow</material>
+  </gazebo>
 
-<gazebo reference="wheel_2">
-  <mu1 value="200.0"/>
-  <mu2 value="100.0"/>
-  <kp value="10000000.0" />
-  <kd value="1.0" />
-  <material>Gazebo/Yellow</material>
-</gazebo>
+  <gazebo reference="wheel_2">
+    <mu1 value="200.0"/>
+    <mu2 value="100.0"/>
+    <kp value="10000000.0" />
+    <kd value="1.0" />
+    <material>Gazebo/Yellow</material>
+  </gazebo>
 
-<gazebo reference="wheel_3">
-  <mu1 value="200.0"/>
-  <mu2 value="100.0"/>
-  <kp value="10000000.0" />
-  <kd value="1.0" />
-  <material>Gazebo/Yellow</material>
-</gazebo>
+  <gazebo reference="wheel_3">
+    <mu1 value="200.0"/>
+    <mu2 value="100.0"/>
+    <kp value="10000000.0" />
+    <kd value="1.0" />
+    <material>Gazebo/Yellow</material>
+  </gazebo>
 
-<gazebo reference="wheel_4">
-  <mu1 value="200.0"/>
-  <mu2 value="100.0"/>
-  <kp value="10000000.0" />
-  <kd value="1.0" />
-  <material>Gazebo/Yellow</material></gazebo>
+  <gazebo reference="wheel_4">
+    <mu1 value="200.0"/>
+    <mu2 value="100.0"/>
+    <kp value="10000000.0" />
+    <kd value="1.0" />
+    <material>Gazebo/Yellow</material>
+  </gazebo>
+
   <!-- Gazebo plugin for ROS Control -->
   <gazebo>
-    <plugin name="gazebo_ros_control" filename="libgazebo_ros_control.so">
-      <robotNamespace>/my_robot</robotNamespace>
-    </plugin>
+      <plugin name="gazebo_ros_control" filename="libgazebo_ros_control.so">
+        <robotNamespace>/my_robot</robotNamespace>
+      </plugin>
   </gazebo>
 
   <!-- Gazebo plugin for IMU-->
@@ -396,13 +318,13 @@
     <gravity>true</gravity>
     <sensor name="imu_sensor" type="imu">
       <always_on>true</always_on>
-      <update_rate>100</update_rate>
+      <update_rate>0</update_rate>
       <visualize>true</visualize>
       <topic>__default_topic__</topic>
       <plugin filename="libgazebo_ros_imu_sensor.so" name="imu_plugin">
         <topicName>imu</topicName>
         <bodyName>imu_link</bodyName>
-        <updateRateHZ>50.0</updateRateHZ>
+        <updateRateHZ>0.0</updateRateHZ> <!-- 10 -->
         <gaussianNoise>0.0</gaussianNoise>
         <xyzOffset>0 0 0</xyzOffset>
         <rpyOffset>0 0 0</rpyOffset>
@@ -419,33 +341,18 @@
   </gazebo>
 
   <gazebo> <!--Does not work to put reference to gps_link here, see: https://answers.ros.org/question/44732/gps-hector-gazebo/-->
-      <plugin name="gps_sim" filename="libhector_gazebo_ros_gps.so">
-        <updateRate>40</updateRate>
-        <bodyName>gps_link</bodyName>
-        <topicName>gps</topicName>
-        <referenceLatitude>0.0</referenceLatitude>
-        <referenceLongitude>0.0</referenceLongitude>
-        <drift>0.0 0.0 0.0</drift>
-        <gaussianNoise>0.0 0.0 0.0</gaussianNoise>
-        <velocityDrift>0 0 0</velocityDrift>
-        <velocityGaussianNoise>0.0 0.0 0.0</velocityGaussianNoise>
-      </plugin>
-    </gazebo>
-
-<!-- Plugin for GPS sensor (NOT WORKING) Keep for reference though
-<gazebo reference= "gps_link">      
-  <controller:hector_gazebo_ros_gps name="quadrotor_gps_sim" plugin="libhector_gazebo_ros_gps.so">
-    <alwaysOn>true</alwaysOn>
-    <updateRate>40.0</updateRate>
-    <bodyName>gps_link</bodyName>
-    <topicName>gps</topicName>
-    <velocityTopicName>gps_vel</velocityTopicName>
-    <drift>0.0 0.0 0.0</drift>
-    <gaussianNoise>0.0 0.0 0.0</gaussianNoise>
-    <velocityDrift>0 0 0</velocityDrift>
-    <velocityGaussianNoise>0.0 0.0 0.0</velocityGaussianNoise>
-  </controller:hector_gazebo_ros_gps>
-</gazebo> -->
+    <plugin name="gps_sim" filename="libhector_gazebo_ros_gps.so">
+      <updateRate>40</updateRate>
+      <bodyName>gps_link</bodyName>
+      <topicName>gps</topicName>
+      <referenceLatitude>0.0</referenceLatitude>
+      <referenceLongitude>0.0</referenceLongitude>
+      <drift>0.0 0.0 0.0</drift>
+      <gaussianNoise>0.0 0.0 0.0</gaussianNoise>
+      <velocityDrift>0 0 0</velocityDrift>
+      <velocityGaussianNoise>0.0 0.0 0.0</velocityGaussianNoise>
+    </plugin>
+  </gazebo>
 
     <!-- Gazebo plugin for laser scan sensor-->
   <gazebo reference="laserscan_link">
@@ -453,7 +360,7 @@
     <mu2>0.2</mu2>
     <material>Gazebo/Orange</material>
   </gazebo>
-<gazebo reference="laserscan_link">
+  <gazebo reference="laserscan_link">
     <sensor type="ray" name="head_hokuyo_sensor">
       <pose>0 0 0 0 0 0</pose>
       <visualize>true</visualize>
@@ -487,62 +394,6 @@
         <frameName>hokuyo_link</frameName>
       </plugin>
     </sensor>
-  </gazebo>
-
-  <!-- camera -->
-   <gazebo reference="camera_link">
-    <mu1>0.2</mu1>
-    <mu2>0.2</mu2>
-    <material>Gazebo/Yellow</material>
-  </gazebo>
-
-  <gazebo reference="camera_link">
-    <sensor type="camera" name="camera1">
-      <visualize>true</visualize>
-      <update_rate>30.0</update_rate>
-      <camera name="head">
-        <horizontal_fov>1.3962634</horizontal_fov>
-        <image>
-          <width>800</width>
-          <height>800</height>
-          <format>R8G8B8</format>
-        </image>
-        <clip>
-          <near>0.02</near>
-          <far>300</far>
-        </clip>
-        <noise>
-          <type>gaussian</type>
-          <!-- Noise is sampled independently per pixel on each frame.
-               That pixel's noise value is added to each of its color
-               channels, which at that point lie in the range [0,1]. -->
-          <mean>0.0</mean>
-          <stddev>0.007</stddev>
-        </noise>
-      </camera>
-      <plugin name="camera_controller" filename="libgazebo_ros_camera.so">
-        <alwaysOn>true</alwaysOn>
-        <updateRate>0.0</updateRate>
-        <cameraName>rrbot/camera1</cameraName>
-        <imageTopicName>image_raw</imageTopicName>
-        <cameraInfoTopicName>camera_info</cameraInfoTopicName>
-        <frameName>camera_link_optical</frameName>
-        <!-- setting hackBaseline to anything but 0.0 will cause a misalignment
-            between the gazebo sensor image and the frame it is supposed to
-            be attached to -->
-        <hackBaseline>0.0</hackBaseline>
-        <distortionK1>0.0</distortionK1>
-        <distortionK2>0.0</distortionK2>
-        <distortionK3>0.0</distortionK3>
-        <distortionT1>0.0</distortionT1>
-        <distortionT2>0.0</distortionT2>
-        <CxPrime>0</CxPrime>
-        <Cx>0.0</Cx>
-        <Cy>0.0</Cy>
-        <focalLength>0.0</focalLength>
-      </plugin>
-    </sensor>
-
   </gazebo>
 
 </robot>
