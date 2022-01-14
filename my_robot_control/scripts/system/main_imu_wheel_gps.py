@@ -106,10 +106,6 @@ if __name__ == "__main__":
     #         The setup function has to be created in the LocalizationEstimator.py file
     loc_est = LocalizationEstimator("imu+wheel+gps", RATE_Hz)
 
-    # MODIFY: Amount of steps the while loop records values.
-    steps = 500
-    i = 0
-
     # MODIFY: Values to record
     recorded_positions = {
         "EKF x":[],
@@ -121,12 +117,18 @@ if __name__ == "__main__":
         "IMU x":[],
         "IMU y":[],
         "Actual x service":[],
-        "Actual y service":[]
+        "Actual y service":[],
+        "Time":[]
     }
 
+    # MODIFY: How far should the robot travel (in y direction) before stopping
+    distance = 120
+    i = 0
+
+    start_time = rospy.get_time()
     imu.set_prev_time(rospy.get_time())
 
-    while i <= steps:
+    while True:
 
         # MODIFY: Measurement vector with your sensor values
         z = np.array([gps_x, gps_y, wheel_x, wheel_y, imu_x_pos, imu_y_pos])
@@ -149,33 +151,40 @@ if __name__ == "__main__":
         recorded_positions["IMU y"].append(imu_y_pos)
         recorded_positions["Actual x service"].append(robot_coordinates.pose.position.x)
         recorded_positions["Actual y service"].append(robot_coordinates.pose.position.y)
+        recorded_positions["Time"].append(rospy.get_time()-start_time)
 
         rate.sleep()
         i += 1
 
+        if (robot_coordinates.pose.position.y > distance):
+            break
+
     # stop robot
     set_wheel_velocity(0)
 
-    # MODIFY: Values to plot.
+    plt.figure(figsize=(14, 6), dpi=120)
 
+    # MODIFY: Values to plot.
     plt.subplot(1, 2, 1) # row 1, col 2 index 1
-    plt.plot(range(0,steps+1), recorded_positions["EKF x"], label="EKF pos")
-    plt.plot(range(0,steps+1), recorded_positions["GPS x"], color="red", label="GPS pos")
-    plt.plot(range(0,steps+1), recorded_positions["Wheel x"], color="green", label="Wheel pos")
-    plt.plot(range(0,steps+1), recorded_positions["IMU x"], color="orange", label="IMU pos")
-    plt.plot(range(0,steps+1), recorded_positions["Actual x service"], color="grey", label="Actual pos service")
+    plt.plot(recorded_positions["Time"], recorded_positions["EKF x"], label="EKF pos")
+    plt.plot(recorded_positions["Time"], recorded_positions["GPS x"], color="red", alpha=0.7, label="GPS pos")
+    plt.plot(recorded_positions["Time"], recorded_positions["Wheel x"], color="green", alpha=0.7, label="Wheel pos")
+    plt.plot(recorded_positions["Time"], recorded_positions["IMU x"], color="orange", alpha=0.7, label="IMU pos")
+    plt.plot(recorded_positions["Time"], recorded_positions["Actual x service"], color="black", label="Actual pos")
     plt.title("X-Distance")
-    plt.xlabel('steps')
+    plt.ylabel("X pos (m)")
+    plt.xlabel('Time (sec)')
     plt.legend()
 
     plt.subplot(1, 2, 2) # index 2
-    plt.plot(range(0, steps+1), recorded_positions["EKF y"], label="EKF pos")
-    plt.plot(range(0, steps+1), recorded_positions["GPS y"], color="red", label="GPS pos")
-    plt.plot(range(0, steps+1), recorded_positions["Wheel y"], color="green", label="Wheel pos")
-    plt.plot(range(0, steps+1), recorded_positions["IMU y"], color="orange", label="IMU pos")
-    plt.plot(range(0,steps+1), recorded_positions["Actual y service"], color="grey", label="Actual pos service")
+    plt.plot(recorded_positions["Time"], recorded_positions["EKF y"], label="EKF pos")
+    plt.plot(recorded_positions["Time"], recorded_positions["GPS y"], color="red", alpha=0.7, label="GPS pos")
+    plt.plot(recorded_positions["Time"], recorded_positions["Wheel y"], color="green", alpha=0.7, label="Wheel pos")
+    plt.plot(recorded_positions["Time"], recorded_positions["IMU y"], color="orange", alpha=0.7, label="IMU pos")
+    plt.plot(recorded_positions["Time"], recorded_positions["Actual y service"], color="black", label="Actual pos")
     plt.title("Y-Distance")
-    plt.xlabel('steps')
+    plt.ylabel("Y pos (m)")
+    plt.xlabel('Time (sec)')
     plt.legend()
 
     plt.show()
