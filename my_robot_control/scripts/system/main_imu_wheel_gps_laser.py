@@ -166,7 +166,7 @@ if __name__ == "__main__":
         rate.sleep()
         i += 1
 
-        if (robot_coordinates.pose.position.y > 120):
+        if (robot_coordinates.pose.position.y > distance):
             break
 
     # stop robot
