@@ -1,7 +1,6 @@
 import tf
 import math
 import haversine as hs
-import datetime
 from haversine import Unit
 #import traceback
 
