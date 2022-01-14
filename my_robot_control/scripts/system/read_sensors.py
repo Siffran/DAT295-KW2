@@ -22,8 +22,8 @@ class Laser:
 		self.front_flag = True
 		self.direction = "forward"
 		self.flag = False
-		self.pass_pole_time = datetime.datetime(1970, 1, 1, 0)
 		self.steering_angle = 0
+		self.pole_detected = False
 	def update_steering_angle(self, data):
 		pose = data.pose[data.name.index('robot::base_link')]
 		quaternion = (
@@ -44,47 +44,53 @@ class Laser:
 		self.direction = "forward" if velocity > 0 else "reverse" 
 
 		self.update_steering_angle(vehicle_data)
-		#print(self.steering_angle)
 		intensities = data.intensities
 		data = data.ranges
-		pole_distance = 6 # pole at 90 degrees
-		
-		if datetime.datetime.now() > self.pass_pole_time + datetime.timedelta(0,5): 
-			#if more than 5 seconds passsed since we last passed a pole, we can look for the next one
-			for i, a in enumerate(data[360+int(math.degrees(self.steering_angle)):410+int(math.degrees(self.steering_angle))]):
-				if intensities[i+360] == 200:
-					self.pass_pole_time = datetime.datetime.now()
-					if self.direction == "forward":
-						self.poles_passed += 1
-					elif self.direction == "reverse":
-						self.poles_passed -= 1
-					break
-		####
-		# Tuples of visible poles, (angle, distance)
-		# Angle 0 is back, 360 is left, 720 is forward as seen if the cart is traveling forwards
+
+		# Pole counting
+		front = 360-4*int(math.degrees(self.steering_angle))
+		back = 400-4*int(math.degrees(self.steering_angle))
+		ray_range = enumerate(data[front:back])
+		for i, _ in ray_range:
+			if intensities[i+front] == 200:
+				if self.direction == "forward" and not self.pole_detected:
+					self.pole_detected = True
+					self.poles_passed += 1
+				elif self.direction == "reverse" and not self.pole_detected:
+					self.pole_detected = True
+					self.poles_passed -= 1
+				break
+			elif intensities[i+back] == 200:
+				if self.direction == "forward" and self.pole_detected:
+					self.pole_detected = False
+				elif self.direction == "reverse" and self.pole_detected:
+					self.pole_detected = False
+				break
+
+		# Angle 0 is forward, 360 is left, 720 is back as seen if the cart is traveling forwards
 		dist, angle = 0, 0
 		found = False
 		if self.direction == "forward":
 			for i, ray in enumerate(data): #i = degree, ray = length/distance
 				if intensities[i] == 200: #poles have intensity of 200 (hardcoded in model)
 					found = True
-					dist, angle = ray, (i-360)/4 # to center the robot on the range, 90 directly to left (realistic)
+					dist, angle = ray, (i-360)/4 # to center the robot on the range
 		elif self.direction == "reverse":
 			for i, ray in enumerate(data[::-1]): #i = degree, ray = length/distance
 				if intensities[i] == 200: #poles have intensity of 200 (hardcoded in model)
 					found = True
-					dist, angle = ray, (i/4) # to center the robot on the range, 90 directly to left (realistic)
-		#print(angle)
-		angle = angle+self.steering_angle
+					dist, angle = ray, (i-360)/4  # to center the robot on the range
+
+		angle = angle+math.degrees(self.steering_angle)
 		if angle <= 0: # pole we see is the next pole (we have not passed it yet so +1)
 			laser_y_pos = self.pole_pos[self.poles_passed][1] + (math.sin(math.radians(angle))*dist)
 			laser_x_pos = self.pole_pos[self.poles_passed][0] + (math.cos(math.radians(angle))*dist)
-		
+			print("pole:{}, Y:{}".format(self.poles_passed, self.laser_y_pos, laser_y_pos))
 
 		else:
 			laser_y_pos = self.pole_pos[self.poles_passed-1][1] + (math.sin(math.radians(angle))*dist)
 			laser_x_pos = self.pole_pos[self.poles_passed-1][0] + (math.cos(math.radians(angle))*dist)
-
+			print("pole:{}, Y:{}".format(self.poles_passed, self.laser_y_pos, laser_y_pos))
 		if not found:
 			print("Could not find a pole.")
 			
@@ -92,8 +98,7 @@ class Laser:
 		if (abs(laser_y_pos - self.laser_y_pos) < 5): #incase of a major change in pos, discard it (sensor error or similar)
 			self.laser_y_pos = laser_y_pos
 		if (abs(laser_x_pos - self.laser_x_pos) < 5): #incase of a major change in pos, discard it (sensor error or similar)
-			self.laser_x_pos = laser_x_pos - pole_distance
-
+			self.laser_x_pos = laser_x_pos
 class IMU:
 
 	def __init__(self):

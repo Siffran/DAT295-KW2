@@ -62,7 +62,6 @@ def callback(gps_data, wheel_data, imu_data, laser_data):
 
     # MODIFY: Add get function of each sensor in the configuration.
     
-    #global imu_x_acc, imu_y_acc, wheel_x, wheel_y, actual_x, actual_y
     global gps_x, gps_y, wheel_x, wheel_y, actual_x, actual_y, imu_x_pos, imu_y_pos, laser_x_pos, laser_y_pos
 
     imu.update(imu_data,rospy.get_time())
@@ -102,9 +101,7 @@ if __name__ == "__main__":
     wheel_sub = message_filters.Subscriber('/gazebo/link_states', gazebo_msgs.msg.LinkStates)
     gps_sub = message_filters.Subscriber('/gps', NavSatFix)
     laser_sub = message_filters.Subscriber('/rrbot/laser/scan', LaserScan)
-    #actual_sub = message_filters.Subscriber('/gazebo/model_states', gazebo_msgs.msg.ModelStates)
 
-    #ts = message_filters.ApproximateTimeSynchronizer([imu_sub, wheel_sub, actual_sub], 10, 0.02, True)
     ts = message_filters.ApproximateTimeSynchronizer([gps_sub, wheel_sub, imu_sub, laser_sub], 10, 0.02, True)
     ts.registerCallback(callback)
 
@@ -130,7 +127,7 @@ if __name__ == "__main__":
     }
 
     # MODIFY: How far should the robot travel (in y direction) before stopping
-    distance = 120
+    distance = 200
     i = 0
 
     start_time = rospy.get_time()
@@ -166,7 +163,7 @@ if __name__ == "__main__":
         rate.sleep()
         i += 1
 
-        if (robot_coordinates.pose.position.y > 120):
+        if (robot_coordinates.pose.position.y > distance):
             break
 
     # stop robot
