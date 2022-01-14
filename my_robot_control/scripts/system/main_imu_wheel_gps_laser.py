@@ -70,7 +70,7 @@ def callback(gps_data, wheel_data, imu_data, laser_data):
     wheel_encoder.update(wheel_data)
     wheel_x, wheel_y = wheel_encoder.get_pos()
     gps_x, gps_y = read_gps_pos(gps_data)
-    laser.update(laser_data)
+    laser.update(laser_data, wheel_data, velocity)
     laser_x_pos, laser_y_pos = laser.get_pos()
     
 if __name__ == "__main__":
@@ -88,7 +88,7 @@ if __name__ == "__main__":
     # Initialize rospy node and frequency
     rospy.init_node('control', anonymous=True)
     rate = rospy.Rate(RATE_Hz)
-
+    global velocity
     # TODO: dynamically changeable velocity via the terminal
     velocity = int(input("Input robot velocity\n"))
     print("Setting velocity to {}".format(velocity))

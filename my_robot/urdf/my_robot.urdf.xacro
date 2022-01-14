@@ -242,7 +242,7 @@
   <joint name="base_to_laserscan" type="fixed">
     <parent link="base_link"/>
     <child link="laserscan_link"/>
-    <origin rpy="0.0 0.0 ${pi}" xyz="0.0 0.2 0.300"/>
+    <origin rpy="0.0 0.0 ${pi}" xyz="0.0 0.2 0.800"/>
     <axis xyz="0 0 1" />
   </joint>
 
@@ -376,7 +376,7 @@
         </scan>
         <range>
           <min>0.10</min>
-          <max>35.0</max>
+          <max>40.0</max>
           <resolution>0.01</resolution>
         </range>
         <noise>

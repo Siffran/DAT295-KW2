@@ -6,7 +6,6 @@ from haversine import Unit
 
 # MODIFY: add your new sensor here. Either as function or class. Depending whats possible.
 
-
 class Laser:
 	def __init__(self):
 		#Hardcoded pole map
@@ -15,115 +14,51 @@ class Laser:
 		#Noisy world
 		#Pole 1: x-pos: , y-pos:
 		self.pole_pos_noise = []
-		self.poles_passed = -1
+		self.poles_passed = 0
 		self.laser_x_pos = 0
 		self.laser_y_pos = 0
 		self.middle_flag = True
 		self.back_flag = True
 		self.front_flag = True
-		self.direction = None
-		self.last_pole_info = None
-	
+		self.direction = "forward"
+		self.flag = False
+		self.pass_pole_time = datetime.datetime(1970, 1, 1, 0)
+		self.steering_angle = 0
+	def update_steering_angle(self, data):
+		pose = data.pose[data.name.index('robot::base_link')]
+		quaternion = (
+			pose.orientation.x,
+			pose.orientation.y,
+			pose.orientation.z,
+			pose.orientation.w)
+		euler = tf.transformations.euler_from_quaternion(quaternion)
+		self.steering_angle = euler[2]
+
 	def get_passed_poles(self):
 		return self.poles_passed
 
 	def get_pos(self):
 		return self.laser_x_pos, self.laser_y_pos
 
-	def update(self, data):
-		# laser.ranges[720]
-		# laser.ranges[0]
-		# float('inf') 
-		####
+	def update(self, data, vehicle_data, velocity):
+		self.direction = "forward" if velocity > 0 else "reverse" 
+
+		self.update_steering_angle(vehicle_data)
+		#print(self.steering_angle)
 		intensities = data.intensities
 		data = data.ranges
-		# Read the range matrix of the laser scan sensor. The range matrix contains 720 samples distributed in 
-		# the angle range of -pi/2 to pi/2. The range[360] corresponds to the distance of the obstacle in the 
-		# scan angle 0, which is x direction. Therefore, when range[360] is lower than 5, the robot is passing a pole.
-		front_distance = min(data[310:330]) # since there is more of an angle compared to the middle, sometimes the polling is out of sync and we miss the pole.
-		middle_distance = min(data[350:370]) # bigger range in case of big speed
-		back_distance = min(data[390:410]) # look at a few rays as to not miss the pole when going fast
-		pole_distance = 5 # pole at 90 degrees
-		side_threshhold = 5.6 # pole at 90 +- 40 degrees
-		min_distance = 2 # anything closer than 2m is discarded. Sometimes the robot and the sensor freak out and this is mostly to filter out that.
-		min_width = 7
-		max_width = 10 # One standard pole covers the angle of average 8 laser beams. Considering the detect angle and distance, we assume 7~10 is a proper range for a pole
-
-		if (front_distance > min_distance) and (front_distance < side_threshhold) and self.front_flag:
-			self.front_flag = False
-		if self.last_pole_info == None:
-			pass
-		elif self.last_pole_info == "middle":
-			self.direction = "reverse"	
-		elif self.last_pole_info == "back":
-			self.direction == "forward" ## Last pole seen was the one behind when leaving last pole
-		elif self.last_pole_info == "front": ## if robot switch directions between poles
-			if self.direction == "forward":
-				self.direction = "reverse"
-			else: 
-				self.direction = "forward"
-		self.last_pole_info = "front"
+		pole_distance = 6 # pole at 90 degrees
 		
-		if (back_distance > min_distance) and (back_distance < side_threshhold) and self.back_flag:
-			self.back_flag = False
-			if self.last_pole_info == None:
-				pass
-			elif self.last_pole_info == "middle":
-				self.direction = "forward"
-			elif self.last_pole_info == "front":
-				self.direction == "reverse" ## Last pole seen was the one in front when leaving last pole
-			elif self.last_pole_info == "back": ## if robot switch directions between poles
-				if self.direction == "forward":
-					self.direction = "reverse"
-				else: 
-					self.direction = "forward"
-			self.last_pole_info = "back"
-			
-		if (middle_distance > min_distance) and (middle_distance < pole_distance) & (self.middle_flag):
-			self.middle_flag = False
-			if self.last_pole_info == None:
-				# This is a bit of an edge-case. This should only happen if you start next to a pole.
-				# Lets assume you always start by going forwards.
-				self.direction = "forward"
-			elif self.last_pole_info == "front":
-				self.direction = "forward"
-			elif self.last_pole_info == "back":
-				self.direction = "reverse"
-			elif self.last_pole_info == "middle":
-				if self.direction == "forward":
-					self.direction = "reverse"
-				else: 
-					self.direction = "forward"
-			self.last_pole_info = "middle"
-			
-			# detect whether the detected object is a tree or not: Approximate the width of the detected object according to the laser angle it covers at a time. Use this to rule out trees and tunnel
-			count = False
-			width = 0
-			detected_distance = 6 # we define 6 as the minimum distance that the laser scan approaches the pole
-			for a in data[330:380]:
-				if a < detected_distance :
-					count = True
-					width = width + 1
-				if (a > detected_distance) and (count):
+		if datetime.datetime.now() > self.pass_pole_time + datetime.timedelta(0,5): 
+			#if more than 5 seconds passsed since we last passed a pole, we can look for the next one
+			for i, a in enumerate(data[360+int(math.degrees(self.steering_angle)):410+int(math.degrees(self.steering_angle))]):
+				if intensities[i+360] == 200:
+					self.pass_pole_time = datetime.datetime.now()
+					if self.direction == "forward":
+						self.poles_passed += 1
+					elif self.direction == "reverse":
+						self.poles_passed -= 1
 					break
-			if (width >= min_width) and (width <= max_width):
-
-				#print("Acceleration from IMY Y: ", imu.linear_acceleration.y)
-				if self.direction == "forward":
-					self.poles_passed = self.poles_passed+1
-				elif self.direction == "reverse": 
-					self.poles_passed = self.poles_passed-1
-				else:
-					pass # Maybe tie into the IMU here to get the direction
-
-		if (not self.middle_flag) and (middle_distance > pole_distance):
-			self.middle_flag = True
-
-		if (not self.front_flag) and (front_distance > side_threshhold):
-			self.front_flag = True
-		
-		if (not self.back_flag) and (back_distance > side_threshhold):
-			self.back_flag = True 
 		####
 		# Tuples of visible poles, (angle, distance)
 		# Angle 0 is back, 360 is left, 720 is forward as seen if the cart is traveling forwards
@@ -133,37 +68,31 @@ class Laser:
 			for i, ray in enumerate(data): #i = degree, ray = length/distance
 				if intensities[i] == 200: #poles have intensity of 200 (hardcoded in model)
 					found = True
-					dist, angle = ray, (i/4) - 90 # to center the robot on the range, 90 directly to left (realistic)
+					dist, angle = ray, (i-360)/4 # to center the robot on the range, 90 directly to left (realistic)
 		elif self.direction == "reverse":
 			for i, ray in enumerate(data[::-1]): #i = degree, ray = length/distance
 				if intensities[i] == 200: #poles have intensity of 200 (hardcoded in model)
 					found = True
-					dist, angle = ray, (i/4) - 90 # to center the robot on the range, 90 directly to left (realistic)
-		else:
-			print("Should never happen lmao xD")
-		for i, ray in enumerate(data): #i = degree, ray = length/distance
-			if intensities[i] == 200: #poles have intensity of 200 (hardcoded in model)
-				found = True
-				dist, angle = ray, (i/4) - 90 # to center the robot on the range, 90 directly to left (realistic)
+					dist, angle = ray, (i/4) # to center the robot on the range, 90 directly to left (realistic)
+		#print(angle)
+		angle = angle+self.steering_angle
+		if angle <= 0: # pole we see is the next pole (we have not passed it yet so +1)
+			laser_y_pos = self.pole_pos[self.poles_passed][1] + (math.sin(math.radians(angle))*dist)
+			laser_x_pos = self.pole_pos[self.poles_passed][0] + (math.cos(math.radians(angle))*dist)
 		
-		if angle < 0: # pole we see is the next pole (we have not passed it yet so +1 and then -dist)
-			laser_y_pos = self.pole_pos[self.poles_passed+1][1] + (math.cos(math.radians(90-angle))*dist)
-			laser_x_pos = self.pole_pos[self.poles_passed+1][1] + (math.sin(math.radians(90-angle))*dist)
-
 
 		else:
-			laser_y_pos = self.pole_pos[self.poles_passed][1] + (math.cos(math.radians(90-angle))*dist)
-			laser_x_pos = self.pole_pos[self.poles_passed][1] + (math.sin(math.radians(90-angle))*dist)
+			laser_y_pos = self.pole_pos[self.poles_passed-1][1] + (math.sin(math.radians(angle))*dist)
+			laser_x_pos = self.pole_pos[self.poles_passed-1][0] + (math.cos(math.radians(angle))*dist)
 
 		if not found:
 			print("Could not find a pole.")
+			
 		
-		#self.laser_x_pos = laser_x_pos Changes pos in x,to do
 		if (abs(laser_y_pos - self.laser_y_pos) < 5): #incase of a major change in pos, discard it (sensor error or similar)
 			self.laser_y_pos = laser_y_pos
 		if (abs(laser_x_pos - self.laser_x_pos) < 5): #incase of a major change in pos, discard it (sensor error or similar)
 			self.laser_x_pos = laser_x_pos - pole_distance
-
 
 class IMU:
 
