@@ -12,7 +12,8 @@ import gazebo_msgs.msg
 # basic libs
 import numpy as np
 from matplotlib import pyplot as plt
-
+import csv
+import pandas as pd  
 
 imu= IMU()
 
@@ -72,8 +73,8 @@ if __name__ == "__main__":
     #         The setup function has to be created in the LocalizationEstimator.py file
     loc_est = LocalizationEstimator("imupos+gps", RATE_Hz)
 
-    # MODIFY: Amount of steps the while loop records values.
-    steps = 400
+    # MODIFY: How far should the robot travel (in y direction) before stopping
+    distance = 20
     i = 0
 
     # MODIFY: Values to record
@@ -85,12 +86,14 @@ if __name__ == "__main__":
         "imu x":[],
         "imu y":[],
         "Actual x":[],
-        "Actual y":[]
+        "Actual y":[],
+        "Time":[]
     }
 
+    start_time = rospy.get_time()
     imu.set_prev_time(rospy.get_time())
 
-    while i <= steps:
+    while True:
     	
         # MODIFY: Measurement vector with your sensor values
         z = np.array([gps_x, gps_y, imu_x_pos, imu_y_pos])
@@ -108,35 +111,47 @@ if __name__ == "__main__":
         recorded_positions["imu y"].append(imu_y_pos)
         recorded_positions["Actual x"].append(actual_x)
         recorded_positions["Actual y"].append(actual_y)
+        recorded_positions["Time"].append(rospy.get_time()-start_time)
 
         rate.sleep()
         i += 1
+        if (actual_y > distance):
+            break
 
     # stop robot
     set_wheel_velocity(0)
+    
+    # save all the data into a csv file
+    dict = {'Time': recorded_positions["Time"],'EKF_x': recorded_positions["EKF x"], 'EKF_y': recorded_positions["EKF y"], 'Actual_x': recorded_positions["Actual x"],'Actual_y': recorded_positions["Actual y"]}  
+    df = pd.DataFrame(dict) 
+    df.to_csv('main_imu_gps.csv') 
+
+
+    plt.figure(figsize=(14, 6), dpi=120)
 
     # MODIFY: Values to plot.
-    fig = plt.figure()
     plt.subplot(1, 2, 1) # row 1, col 2 index 1
-    plt.plot(range(0,steps+1), recorded_positions["EKF x"], label="EKF pos")
-    plt.plot(range(0,steps+1), recorded_positions["gps x"], color="red", label="GPS pos")
-    plt.plot(range(0,steps+1), recorded_positions["imu x"], color="green", label="imu pos")
-    plt.plot(range(0,steps+1), recorded_positions["Actual x"], color="black", label="Actual pos")
-    plt.title("x distance")
-    plt.xlabel('steps ')
-    plt.ylabel('X-Distance ')
+    plt.plot(recorded_positions["Time"], recorded_positions["EKF x"], label="EKF pos")
+    plt.plot(recorded_positions["Time"], recorded_positions["gps x"], color="red", alpha=0.7, label="GPS pos")
+    plt.plot(recorded_positions["Time"], recorded_positions["imu x"], color="orange", alpha=0.7, label="IMU pos")
+    plt.plot(recorded_positions["Time"], recorded_positions["Actual x"], color="black", label="Actual pos")
+    plt.title("X-Distance")
+    plt.ylabel("X pos (m)")
+    plt.xlabel('Time (sec)')
     plt.legend()
-    
-    plt.subplot(1, 2, 2) # row 1, col 2 index 1
-    plt.plot(range(0,steps+1), recorded_positions["EKF y"], label="EKF pos")
-    plt.plot(range(0,steps+1), recorded_positions["gps y"], color="red", label="GPS pos")
-    plt.plot(range(0,steps+1), recorded_positions["imu y"], color="green", label="imu pos")
-    plt.plot(range(0,steps+1), recorded_positions["Actual y"], color="black", label="Actual pos")
-    plt.title("y distance")
-    plt.xlabel('steps ')
-    plt.ylabel('Y-Distance ')
+
+    plt.subplot(1, 2, 2) # index 2
+    plt.plot(recorded_positions["Time"], recorded_positions["EKF y"], label="EKF pos")
+    plt.plot(recorded_positions["Time"], recorded_positions["gps y"], color="red", alpha=0.7, label="GPS pos")
+    plt.plot(recorded_positions["Time"], recorded_positions["imu y"], color="orange", alpha=0.7, label="IMU pos")
+    plt.plot(recorded_positions["Time"], recorded_positions["Actual y"], color="black", label="Actual pos")
+    plt.title("Y-Distance")
+    plt.ylabel("Y pos (m)")
+    plt.xlabel('Time (sec)')
     plt.legend()
-    
+
+    plt.show()
+'''    
     # the error between the estimated position 
     fig2 = plt.figure()
     plt.subplot(1, 2, 1) # index 2
@@ -163,5 +178,6 @@ if __name__ == "__main__":
     plt.legend()
 
     plt.show()
+'''
         
     

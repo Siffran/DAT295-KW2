@@ -13,6 +13,8 @@ from sensor_msgs.msg import LaserScan, Imu, NavSatFix
 # basic libs
 import numpy as np
 from matplotlib import pyplot as plt
+import csv
+import pandas as pd  
 
 '''
 How to solve the problem :)
@@ -122,7 +124,7 @@ if __name__ == "__main__":
     }
 
     # MODIFY: How far should the robot travel (in y direction) before stopping
-    distance = 120
+    distance = 20
     i = 0
 
     start_time = rospy.get_time()
@@ -162,6 +164,12 @@ if __name__ == "__main__":
     # stop robot
     set_wheel_velocity(0)
 
+    
+    # save all the data into a csv file
+    dict = {'Time': recorded_positions["Time"], 'EKF_x': recorded_positions["EKF x"], 'EKF_y': recorded_positions["EKF y"], 'Actual_x': recorded_positions["Actual x service"],'Actual_y': recorded_positions["Actual y service"]}  
+    df = pd.DataFrame(dict) 
+    df.to_csv('main_imu_wheel_gps.csv') 
+    
     plt.figure(figsize=(14, 6), dpi=120)
 
     # MODIFY: Values to plot.
