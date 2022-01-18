@@ -10,10 +10,10 @@ class Laser:
 	def __init__(self):
 		#Hardcoded pole map
 		#Clean world
-		self.pole_pos = [(-5,0), (-5,60), (-5,120), (-5,180), (-5, 240), (-5,300), (-5,360), (-5,420), (-5,480), (-5,540), (-5,600)]
+		#self.pole_pos = [(-5,0), (-5,60), (-5,120), (-5,180), (-5, 240), (-5,300), (-5,360), (-5,420), (-5,480), (-5,540), (-5,600)]
 		#Noisy world
+		self.pole_pos = [(-5,0), (-5,60), (11,120), (-5,180), (-5, 240), (-5,300), (-5,360), (-5,420), (-5,480), (-5,540), (-5,600)]
 		#Pole 1: x-pos: , y-pos:
-		self.pole_pos_noise = []
 		self.poles_passed = 0
 		self.laser_x_pos = 0
 		self.laser_y_pos = 0

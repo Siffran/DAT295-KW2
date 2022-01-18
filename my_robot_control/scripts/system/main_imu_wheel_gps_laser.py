@@ -129,7 +129,7 @@ if __name__ == "__main__":
     }
 
     # MODIFY: How far should the robot travel (in y direction) before stopping
-    distance = 20
+    distance = 200
     i = 0
 
     start_time = rospy.get_time()
