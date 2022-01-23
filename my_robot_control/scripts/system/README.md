@@ -12,6 +12,12 @@ Collection of functions to read from sensors
 
 We figured it would be most simple to have one main file for each system configuration. This one uses imu acceleration and wheel encoder.
 
+**LocationEstimator.py**
+
+Setup of your EKF.
+
+
+
 # How to create a system configuration
 We have created a template that can be adjusted for each sensor configuration. It's not overengineered to be very dynamic and requires the author to write new code for each configuration. 
 
